@@ -1,3 +1,4 @@
+//E/E-frontend/components/ImageModal/imageModal.jsx
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
 import CircularProgress from '@mui/material/CircularProgress';

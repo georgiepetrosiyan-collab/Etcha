@@ -1,3 +1,5 @@
+//E/E-frontend/pages/AllActivites/allActivites.jsx 
+
 import React, { useEffect, useState } from 'react'
 import ProfileCard from '../../components/ProfileCard/profileCard'
 import { useParams } from 'react-router-dom'
@@ -14,8 +16,8 @@ const AllActivities = () => {
   const [ownData, setOwnData] = useState(null)
 
   const fetchDataOnLoad = async () => {
-    await axios.get("http://localhost:4000/api/post/getAllPostForUser/${id}").then(res=>{
-      setPosts(res.data.posts)
+    await axios.get(`http://localhost:4000/api/post/getAllPostForUser/${id}`).then(res=>{
+      setPosts(res.data.post || [])
     }).catch(err=>{
       console.log(err)
       alert(err?.response?.data?.error)
@@ -48,8 +50,8 @@ const AllActivities = () => {
 
         <div>
           <Card padding={1} >
-            <div className='="text-xl'>All Activites</div>
-            <div classNmae="cursor-pounter w-fit p-2 border rounded-4xl bg-green-800 my-2 text-white font-semibold">Posts</div>
+            <div className='text-xl'>All Activites</div>
+            <div className="cursor-pointer w-fit p-2 border rounded-4xl bg-green-800 my-2 text-white font-semibold">Posts</div>
 
             <div className="my-2 flex flex-col gap-2">
               {

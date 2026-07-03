@@ -1,3 +1,4 @@
+//E/E-backend/controller/message.js
 const MessageModel = require('../models/message');
 
 exports.getMessages = async (req, res) => {

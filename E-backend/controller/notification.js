@@ -1,3 +1,4 @@
+//E/E-backend/controller/notification.js
 const NotificationModel = require('../models/notification'); 
 
 exports.getNotification = async (req, res) => {

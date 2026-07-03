@@ -1,5 +1,6 @@
+//E/E-frontend/pages/Profile/profile.jsx 
+
 import React, { useState, useEffect } from 'react';
-// Make sure this folder/file spelling perfectly matches your system!
 import Advertisement from '../../components/Advertisement/advertisement';
 import Card from '../../components/Card/card';
 import Post from '../../components/Post/post';
@@ -44,7 +45,9 @@ const Profile = () => {
     }
 
     useEffect(() => {
-        fetchDataOnLoad();
+        if (id && id !== "undefined") {
+            fetchDataOnLoad();
+        }
     }, [id]);
 
     const fetchDataOnLoad = async () => {
@@ -56,10 +59,9 @@ const Profile = () => {
             ]);
 
             setUserData(userDatas?.data?.user);
-            setPostData(postDatas?.data?.posts || []);
+            setPostData(postDatas?.data?.post || []);
             setOwnData(ownDatas?.data?.user);
 
-            {/* Please Watch the video for full code */ }
             localStorage.setItem('userInfo', JSON.stringify(ownDatas.data.user));
 
         } catch (err) {
@@ -110,18 +112,21 @@ const Profile = () => {
         });
     }
 
+    // FIX: use .toString() comparisons instead of === since these are
+    // Mongo ObjectId objects (or a mix of ObjectId/string), which never
+    // strictly-equal each other even when they represent the same ID.
     const amIfriend = () => {
-        let arr = userData?.friends?.filter((item) => { return item === ownData?._id });
+        let arr = userData?.friends?.filter((item) => item?.toString() === ownData?._id?.toString());
         return arr?.length;
     }
 
     const isInPendingList = () => {
-        let arr = userData?.pending_friends?.filter((item) => { return item === ownData?._id })
+        let arr = userData?.pending_friends?.filter((item) => item?.toString() === ownData?._id?.toString())
         return arr?.length;
     }
 
     const isInSelfPendingList = () => {
-        let arr = ownData?.pending_friends?.filter((item) => { return item === userData?._id })
+        let arr = ownData?.pending_friends?.filter((item) => item?.toString() === userData?._id?.toString())
         return arr?.length;
     }
 
@@ -207,7 +212,6 @@ const Profile = () => {
                         <Card padding={0}>
                             <div className='w-full h-fit '>
                                 <div className='relative w-full h-50'>
-                                    {/* FIX 1: Moved onClick inside the div tag attributes */}
                                     {
                                         userData?._id == ownData?._id &&
                                         <div className="absolute cursor-pointer top-3 right-3 z-20 w-9 flex justify-center items-center h-9 rounded-full p-3 bg-white"
@@ -270,7 +274,7 @@ const Profile = () => {
                             </div>
                             <div className='text-gray-700 text-md my-2 w-full flex gap-4 flex-wrap'>
                                 {
-                                    userData?.skills.map((item, index) => {
+                                    userData?.skills?.map((item, index) => {
                                         return (
                                             <div key={index} className='py-2 px-3 cursor-pointer bg-blue-800 text-white rounded-lg'>{item}</div>
                                         )
@@ -285,26 +289,19 @@ const Profile = () => {
                             <div className='flex justify-between items-center'>
                                 <div className='text-xl'>Activities</div>
                             </div>
-                            <div className='cursor-pointer px-3 py-1 w-fit border rounded-4xl bg-green-800 text-white font-semibold'>Posts</div>
 
-                            <div className="overflow-x-auto my-2 flex gap-1 overflow-y-hidden w-full">
-                                <div className="cursor-pointer px-3 py-1 w-fit border rounded-4xl bg-green-800 text-white font-semibold mt-2">
-                                    Posts
-                                </div>
+                            <div className='cursor-pointer px-3 py-1 w-fit border rounded-4xl bg-green-800 text-white font-semibold mt-2'>Posts</div>
 
-                                <div className="overflow-x-auto my-2 flex gap-1 overflow-y-hidden w-full">
-                                    {/* FIX 2: Replaced single quotes with backticks for literal evaluation */}
-                                    {/* FIX 3: Fixed the unclosed Link tag. `<Link/>` was changed to `</Link>` */}
-                                    {
-                                        postData.map((item, ind) => {
-                                            return (
-                                                <Link to={`/profile/${id}/activities/${item?._id}`} className="cursor-pointer shrink-0 w-88 h-140">
-                                                    <Post profile={1} item={item} personalData={ownData} />
-                                                </Link>
-                                            )
-                                        })
-                                    }
-                                </div>
+                            <div className="overflow-x-auto my-2 flex gap-1 overflow-y-hidden w-full items-start">
+                                {
+                                    postData.map((item, ind) => {
+                                        return (
+                                            <Link key={item?._id || ind} to={`/profile/${id}/activities/${item?._id}`} className="cursor-pointer shrink-0 w-88 h-140">
+                                                <Post profile={1} item={item} personalData={ownData} />
+                                            </Link>
+                                        )
+                                    })
+                                }
                             </div>
 
                             {postData.length > 5 && (
@@ -317,18 +314,15 @@ const Profile = () => {
 
                     <div className='mt-5'>
                         <Card padding={1}>
-                            {/* FIX 4: Typo 'itrms-center' changed to 'items-center' */}
                             <div className="flex justify-between items-center">
                                 <div className="text-xl">Experience</div>
                                 {
                                     userData?._id == ownData?._id && <div onClick={handleExpModal} className="cursor-pointer">
-                                        {/* Added an AddIcon here as the div was completely empty before */}
                                         <AddIcon />
                                     </div>
                                 }
                             </div>
                             <div className='mt-5'>
-                                {/* FIXED: Now uses actual user data and valid markup */}
                                 {userData?.experience?.map((item, index) => {
                                     return (
                                         <div key={index} className='p-2 border-t border-gray-300 flex justify-between'>

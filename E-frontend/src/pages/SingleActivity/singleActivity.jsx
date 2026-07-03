@@ -1,3 +1,5 @@
+//E/E-frontend/pages/SingleActivity/singleActivity.jsx 
+
 import React, { useState, useEffect } from 'react'
 import ProfileCard from '../../components/ProfileCard/profileCard'
 import Card from '../../components/Card/card'
@@ -15,7 +17,7 @@ const SingleActivity = () => {
 
 
     const fetchDataOnLoad = async () => {
-        await axios.get("http://localhost:4000/api/post/getPostById/${postId}").then((res => {
+        await axios.get(`http://localhost:4000/api/post/getPostById/${postId}`).then((res => {
             console.log(res)
             setPost(res.data.post)
         })).catch(err => {

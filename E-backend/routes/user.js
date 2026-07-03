@@ -1,3 +1,4 @@
+//E/E-backend/routes/user.js
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controller/user');
@@ -5,7 +6,7 @@ const Authentication = require('../authentication/auth')
 
 router.post('/register', UserController.register)
 router.post('/login',UserController.login)
-router.post('/google',UserController.loginThroghGmail)
+router.post('/google',UserController.loginThroughGmail)
 
 router.put('/update',Authentication.auth,UserController.updateUser)
 router.get('/user/:id',UserController.getProfileById)
@@ -20,6 +21,7 @@ router.get('/self',Authentication.auth,(req,res)=>{
 router.get('/findUser',Authentication.auth,UserController.findUser)
 router.post('/sendFriendReq',Authentication.auth,UserController.sendFriendRequest)
 router.post('/acceptFriendRequest',Authentication.auth,UserController.acceptFriendRequest);
+router.post('/ignoreFriendRequest',Authentication.auth,UserController.ignoreFriendRequest);
 router.delete('/removeFromFriendList/:friendId',Authentication.auth,UserController.removeFromFriend)
 
 router.get('/friendsList',Authentication.auth,UserController.getFriendsList)

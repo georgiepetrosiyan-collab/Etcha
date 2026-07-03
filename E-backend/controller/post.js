@@ -1,3 +1,4 @@
+//E/E-backend/controller/post.js
 const PostModel = require('../models/post');
 
 exports.addPost = async (req, res) => {

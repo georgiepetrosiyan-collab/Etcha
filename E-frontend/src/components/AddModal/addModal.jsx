@@ -1,3 +1,5 @@
+//E/E-frontend/components/AddModal/addModal.jsx
+
 import React, { useState } from 'react';
 import ImageIcon from '@mui/icons-material/Image';
 import { ToastContainer, toast } from 'react-toastify';

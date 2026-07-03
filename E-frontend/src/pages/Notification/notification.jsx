@@ -1,3 +1,5 @@
+//E/E-frontend/pages/Notification/notification.jsx 
+
 import React, { useEffect, useState } from 'react';
 import ProfileCard from '../../components/ProfileCard/profileCard';
 import Advertisement from '../../components/Advertisement/advertisement';

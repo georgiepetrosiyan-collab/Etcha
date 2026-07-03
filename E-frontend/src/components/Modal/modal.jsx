@@ -1,3 +1,4 @@
+//E/E-frontend/components/Modal/modal.jsx
 import React from 'react'
 import CloseIcon from '@mui/icons-material/Close';
 const Modal = (props) => {

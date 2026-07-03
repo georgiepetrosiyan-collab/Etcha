@@ -1,18 +1,19 @@
+//E/E-backend/controller/user.js
 const User = require('../models/user');
 const bcryptjs = require('bcryptjs');
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
-const NotificationModel = require('../models/notification'); // Renamed from Modal
+const NotificationModel = require('../models/notification'); 
 
 const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // Dynamically sets to true only in prod
+    secure: process.env.NODE_ENV === 'production', 
     sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
 };
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-exports.loginThroughGmail = async (req, res) => { // Fixed typo: Throgh -> Through
+exports.loginThroughGmail = async (req, res) => { 
     try {
         const { token } = req.body;
         
@@ -39,12 +40,10 @@ exports.loginThroughGmail = async (req, res) => { // Fixed typo: Throgh -> Throu
             });
         }
 
-        // Added expiration to JWT
         const jwttoken = jwt.sign({ userId: userExist._id }, process.env.JWT_PRIVATE_KEY, { expiresIn: '7d' });
         
         res.cookie('token', jwttoken, cookieOptions);
         
-        // Ensure we don't send the password back if it's a previously registered user
         userExist.password = undefined; 
         return res.status(200).json({ user: userExist });
 
@@ -71,7 +70,7 @@ exports.register = async (req, res) => {
         const newUser = new User({ email, password: hashedPassword, f_name }); 
         await newUser.save();
 
-        newUser.password = undefined; // Prevent sending password back
+        newUser.password = undefined; 
 
         return res.status(201).json({ 
             message: 'User registered successfully', 
@@ -132,13 +131,25 @@ exports.updateUser = async (req, res) => {
             return res.status(400).json({ error: 'User update data is required' });
         }
 
-        // SECURITY FIX: Prevent updating sensitive fields via this route
-        if (user.password || user.email || user.googleId) {
-            return res.status(403).json({ error: 'Cannot update sensitive fields via this route' });
-        }
+        const allowedUpdates = {
+            f_name: user.f_name,
+            headline: user.headline,
+            curr_company: user.curr_company,
+            curr_location: user.curr_location,
+            profilePic: user.profilePic,
+            cover_pic: user.cover_pic,
+            about: user.about,
+            skills: user.skills,
+            experience: user.experience
+        };
 
-        // Used { new: true } to get the updated document, avoiding a secondary findById query
-        const updatedUser = await User.findByIdAndUpdate(req.user._id, user, { new: true }).select("-password");
+        Object.keys(allowedUpdates).forEach(key => allowedUpdates[key] === undefined && delete allowedUpdates[key]);
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user._id, 
+            { $set: allowedUpdates }, 
+            { new: true, runValidators: true }
+        ).select("-password");
 
         if (!updatedUser) {
             return res.status(404).json({ error: 'User does not exist' });
@@ -159,11 +170,10 @@ exports.getProfileById = async (req, res) => {
     try {
         const { id } = req.params;
         
-        // Prevent password leakage
         const isExist = await User.findById(id).select('-password');
 
         if (!isExist) {
-            return res.status(404).json({ error: "No such user exists" }); // Fixed to 404
+            return res.status(404).json({ error: "No such user exists" });
         }
 
         return res.status(200).json({
@@ -188,19 +198,21 @@ exports.findUser = async (req, res) => {
             return res.status(400).json({ error: "Search query is required" });
         }
 
+        const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
         const users = await User.find({
             $and: [
                 { _id: { $ne: req.user._id } },
                 {
                     $or: [
-                        { f_name: { $regex: new RegExp(`^${query}`, "i") } }, // Fixed from 'name' to 'f_name'
-                        { email: { $regex: new RegExp(`^${query}`, "i") } }
+                        { f_name: { $regex: new RegExp(`^${escapedQuery}`, "i") } },
+                        { email: { $regex: new RegExp(`^${escapedQuery}`, "i") } }
                     ]
                 }
             ]
-        }).select('-password'); // Prevent password leakage
+        }).select('-password'); 
 
-        return res.status(200).json({ // Changed to 200 (GET request)
+        return res.status(200).json({ 
             message: "Fetched Members",
             users: users
         });
@@ -213,11 +225,14 @@ exports.findUser = async (req, res) => {
 exports.sendFriendRequest = async (req, res) => {
     try {
         const sender = req.user._id;
-        // Accept both to prevent breaking current frontend while fixing the typo
         const receiverId = req.body.receiver || req.body.reciever; 
 
         if (!receiverId) {
             return res.status(400).json({ error: "Receiver ID is required" });
+        }
+
+        if (sender.toString() === receiverId.toString()) {
+            return res.status(400).json({ error: "Cannot send a friend request to yourself" });
         }
 
         const userExist = await User.findById(receiverId);
@@ -225,16 +240,16 @@ exports.sendFriendRequest = async (req, res) => {
             return res.status(404).json({ error: "No such user exists." });
         }
         
-        // Fast checks to prevent duplicate requests
-        if (userExist.friends.includes(sender)) {
+        const isAlreadyFriend = userExist.friends.some(id => id.toString() === sender.toString());
+        if (isAlreadyFriend) {
             return res.status(400).json({ error: "Already Friends" });
         }
 
-        if (userExist.pending_friends.includes(sender)) {
+        const isRequestPending = userExist.pending_friends.some(id => id.toString() === sender.toString());
+        if (isRequestPending) {
             return res.status(400).json({ error: "Request Already Sent" });
         }
 
-        // Atomic update to prevent race conditions
         await User.findByIdAndUpdate(receiverId, {
             $addToSet: { pending_friends: sender }
         });
@@ -258,6 +273,9 @@ exports.sendFriendRequest = async (req, res) => {
 }
 
 exports.acceptFriendRequest = async (req, res) => {
+    console.log("=== ACCEPT ROUTE HIT ===");
+    console.log("req.body:", req.body);
+    console.log("req.user:", req.user ? req.user._id : "NO USER");
     try {
         const { friendId } = req.body;
         const selfId = req.user._id;
@@ -271,12 +289,16 @@ exports.acceptFriendRequest = async (req, res) => {
             return res.status(404).json({ error: "No such user exists." });
         }
         
-        // Ensure a pending request actually exists before processing
-        if (!req.user.pending_friends.includes(friendId)) {
+        const hasPendingRequest = req.user.pending_friends.some(id => id.toString() === friendId.toString());
+        if (!hasPendingRequest) {
             return res.status(400).json({ error: "No friend request found from this user" });
         }
 
-        // Atomic updates to prevent array race conditions
+        const isAlreadyFriend = req.user.friends.some(id => id.toString() === friendId.toString());
+        if (isAlreadyFriend) {
+            return res.status(400).json({ error: "Already friends with this user" });
+        }
+
         await User.findByIdAndUpdate(selfId, {
             $pull: { pending_friends: friendId },
             $addToSet: { friends: friendId }
@@ -299,14 +321,43 @@ exports.acceptFriendRequest = async (req, res) => {
             message: "You are both connected now."
         });
     } catch (err) {
-        console.error(err);
+        console.error("=== ACCEPT ERROR ===", err);
+        res.status(500).json({ error: 'Server error', message: err.message });
+    }
+}
+
+exports.ignoreFriendRequest = async (req, res) => {
+    console.log("=== IGNORE ROUTE HIT ===");
+    console.log("req.body:", req.body);
+    console.log("req.user:", req.user ? req.user._id : "NO USER");
+    try {
+        const { friendId } = req.body;
+        const selfId = req.user._id;
+
+        if (!friendId) {
+            return res.status(400).json({ error: "Friend ID is required" });
+        }
+
+        const hasPendingRequest = req.user.pending_friends.some(id => id.toString() === friendId.toString());
+        if (!hasPendingRequest) {
+            return res.status(400).json({ error: "No friend request found from this user" });
+        }
+
+        await User.findByIdAndUpdate(selfId, {
+            $pull: { pending_friends: friendId }
+        });
+
+        return res.status(200).json({
+            message: "Friend request ignored"
+        });
+    } catch (err) {
+        console.error("=== IGNORE ERROR ===", err);
         res.status(500).json({ error: 'Server error', message: err.message });
     }
 }
 
 exports.getFriendsList = async (req, res) => {
     try {
-        // Exclude passwords from populated objects
         const user = await User.findById(req.user._id).populate('friends', '-password');
 
         return res.status(200).json({
@@ -320,7 +371,6 @@ exports.getFriendsList = async (req, res) => {
 
 exports.getPendingFriendList = async (req, res) => {
     try {
-        // Exclude passwords from populated objects
         const user = await User.findById(req.user._id).populate('pending_friends', '-password');
 
         return res.status(200).json({
@@ -346,11 +396,11 @@ exports.removeFromFriend = async (req, res) => {
             return res.status(404).json({ error: "No such user exists" });
         }
 
-        if (!req.user.friends.includes(friendId)) {
+        const isFriend = req.user.friends.some(id => id.toString() === friendId.toString());
+        if (!isFriend) {
             return res.status(400).json({ error: "You are not friends with this user" });
         }
 
-        // Atomic update to safely remove from both arrays
         await User.findByIdAndUpdate(selfId, {
             $pull: { friends: friendId }
         });

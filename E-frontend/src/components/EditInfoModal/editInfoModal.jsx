@@ -1,3 +1,4 @@
+//E/E-frontend/components/EditInfoModal/editInfoModal.jsx
 import React, { useState } from 'react'
 
 const EditinfoModal = ({ handleEditFunc, selfData }) => {

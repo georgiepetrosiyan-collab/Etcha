@@ -1,3 +1,5 @@
+//E/E-frontend/components/Card/card.jsx
+
 import React from 'react'
 
 const Card = (props) => {

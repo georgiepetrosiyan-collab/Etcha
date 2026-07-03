@@ -1,3 +1,6 @@
+//E/E-frontend/pages/SignUp/signUp.jsx 
+
+
 import React, { useState } from 'react' // Added missing useState
 import { Link, useNavigate } from 'react-router-dom' // Added missing useNavigate
 import GoogleLoginComp from "../../components/GoogleLogin/GoogleLoginComp";

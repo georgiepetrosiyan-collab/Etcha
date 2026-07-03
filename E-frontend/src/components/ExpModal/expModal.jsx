@@ -1,3 +1,4 @@
+//E/E-frontend/components/ExpModal/expModal.jsx
 import React, { useState } from 'react'
 
 const ExpModal = ({ handleEditFunc, selfData, updateExp, setUpdateExp }) => {

@@ -1,3 +1,5 @@
+//E/E-frontend/pages/LandingPage/landingPage.jsx 
+
 import React from 'react'
 import { Link } from 'react-router-dom'
 import GoogleLoginComp from '../../components/GoogleLogin/googleLoginComp'

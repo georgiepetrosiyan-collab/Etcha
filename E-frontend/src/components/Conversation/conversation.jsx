@@ -1,3 +1,5 @@
+//E/E-frontend/components/Conversation/conversation.jsx
+
 import React, { useEffect, useState } from 'react';
 
 const Conversation = ({ item, ownData, handleSelectedConv, activeConvId }) => {

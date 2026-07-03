@@ -1,3 +1,5 @@
+/* //E/E-frontend/components/NavBar_2/navbar_2.jsx */
+
 import React, { useState, useEffect } from 'react'
 import "./navbar2.css"
 import axios from 'axios'  // FIX 1: Missing axios import

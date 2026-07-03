@@ -1,5 +1,7 @@
+//E/E-frontend/components/MessageModal/messageModal.jsx
 import React, { useState } from 'react'
 import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const MessageModal = ({ selfData, userData }) => {
     const [message, setMessage] = useState('')

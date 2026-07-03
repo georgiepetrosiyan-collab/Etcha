@@ -1,4 +1,7 @@
+//E/E-frontend/components/Advertisement/advertisement.jsx
+
 import React,{useState,useEffect} from 'react'
+
 import Card from '../Card/card'
 
 const Advertisement = () => {

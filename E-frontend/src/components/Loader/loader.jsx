@@ -1,3 +1,4 @@
+//E/E-frontend/components/Loader/loader.jsx
 import React from 'react'
 import './loader.css'
 const Loader = () => {
