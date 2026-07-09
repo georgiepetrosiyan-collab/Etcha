@@ -126,7 +126,7 @@ const Post = ({ profile, item, personalData }) => {
             <div className='px-4 py-2 flex justify-between items-center'>
                 {!profile && (
                     <div className='flex gap-1 items-center'>
-                        <ThumbUpIcon sx={{ color: "blue", fontSize: 14 }} />
+                        <ThumbUpIcon sx={{ fontSize: 14 }} className="text-gray-600" />
                         <div className='text-sm text-gray-600'>{noOfLikes} Likes</div>
                     </div>
                 )}
@@ -141,7 +141,7 @@ const Post = ({ profile, item, personalData }) => {
             {!profile && (
                 <div className="flex p-1">
                     <div onClick={handleLikeFunc} className="w-[33%] justify-center flex gap-2 items-center border-r border-gray-100 p-2 cursor-pointer hover:bg-gray-100">
-                        {liked ? <ThumbUpIcon sx={{ fontSize: 22, color: "blue" }} /> : <ThumbUpOutlinedIcon sx={{ fontSize: 22 }} />}
+                        {liked ? <ThumbUpIcon sx={{ fontSize: 22, color: "#00827D" }} /> : <ThumbUpOutlinedIcon sx={{ fontSize: 22 }} />}
                         <span>{liked ? 'Liked' : "Like"}</span>
                     </div>
 
