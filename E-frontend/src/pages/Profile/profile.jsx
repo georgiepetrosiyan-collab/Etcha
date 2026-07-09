@@ -6,7 +6,7 @@ import Card from '../../components/Card/card';
 import Post from '../../components/Post/post';
 import Modal from '../../components/Modal/modal';
 import ImageModal from '../../components/ImageModal/imageModal';
-import EditinfoModal from '../../components/EditInfoModal/editinfoModal';
+import EditinfoModal from '../../components/EditInfoModal/editInfoModal';
 import AboutModal from '../../components/AboutModal/aboutModal';
 import ExpModal from '../../components/ExpModal/expModal';
 import MessageModal from '../../components/MessageModal/messageModal';

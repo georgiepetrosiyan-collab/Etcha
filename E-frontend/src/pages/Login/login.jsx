@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom' // Added missing imports
-import GoogleLoginComp from "../../components/GoogleLogin/GoogleLoginComp";
+import GoogleLoginComp from "../../components/GoogleLogin/googleLoginComp";
 import { ToastContainer, toast } from 'react-toastify'
 import axios from 'axios'
 

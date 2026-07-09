@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react' // Added missing useState
 import { Link, useNavigate } from 'react-router-dom' // Added missing useNavigate
-import GoogleLoginComp from "../../components/GoogleLogin/GoogleLoginComp";
+import GoogleLoginComp from "../../components/GoogleLogin/googleLoginComp";
 import { ToastContainer, toast } from 'react-toastify'
 import axios from 'axios'
 
