@@ -93,7 +93,7 @@ const Post = ({ profile, item, personalData }) => {
     return (
         <Card padding={0}>
             {/* User Profile Header */}
-            <div className='flex gap-3 p-4'>
+            <div className='flex gap-3 p-4 pb-2'>
                 <Link to={`/profile/${item?.user?._id}`} className='w-12 h-12 rounded-4xl'>
                     <img className='rounded-4xl w-12 h-12 border-2 border-white cursor-pointer' src={item?.user?.profilePic} alt="user avatar" />
                 </Link>
@@ -104,7 +104,7 @@ const Post = ({ profile, item, personalData }) => {
             </div>
 
             {/* Post Description Text Block */}
-            <div className='text-md p-4 my-3 whitespace-pre-line grow'>
+            <div className='text-md px-4 py-2 whitespace-pre-line grow'>
                 {seeMore ? desc : desc?.length > 50 ? `${desc.slice(0, 50)}...` : `${desc.slice(0, 50)}`}
                 {desc?.length > 50 && (
                     <span onClick={() => setSeeMore(prev => !prev)} className="cursor-pointer text-gray-500 font-medium">
@@ -121,7 +121,7 @@ const Post = ({ profile, item, personalData }) => {
             )}
 
             {/* Engagement Row Status Bar */}
-            <div className='my-2 p-4 flex justify-between items-center'>
+            <div className='px-4 py-2 flex justify-between items-center'>
                 {!profile && (
                     <div className='flex gap-1 items-center'>
                         <ThumbUpIcon sx={{ color: "blue", fontSize: 14 }} />
