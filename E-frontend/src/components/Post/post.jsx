@@ -15,6 +15,16 @@ import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 import CommentIcon from '@mui/icons-material/Comment';
 import SendIcon from '@mui/icons-material/Send';
 
+// TODO update if adding a localization library, which should have proper plural support
+function formatLikes(noOfLikes) {
+    if (noOfLikes == 1) return `${noOfLikes} like`
+    return `${noOfLikes} likes`
+}
+function formatComments(noOfComments) {
+    if (noOfComments == 1) return `${noOfComments} comment`
+    return `${noOfComments} comments`
+}
+
 const Post = ({ profile, item, personalData }) => {
     const [seeMore, setSeeMore] = useState(false);
     const [comment, setComment] = useState(false);
@@ -127,13 +137,13 @@ const Post = ({ profile, item, personalData }) => {
                 {!profile && (
                     <div className='flex gap-1 items-center'>
                         <ThumbUpIcon sx={{ fontSize: 14 }} className="text-gray-600" />
-                        <div className='text-sm text-gray-600'>{noOfLikes} Likes</div>
+                        <div className='text-sm text-gray-600'>{formatLikes(noOfLikes)}</div>
                     </div>
                 )}
 
                 {/* Right side: Comments Counter */}
                 <div className='flex gap-1 items-center'>
-                    <div className='text-sm text-gray-600'>{item?.comments || item?.comment?.length || 0} Comments</div>
+                    <div className='text-sm text-gray-600'>{formatComments(item?.comments || item?.comment?.length || 0)}</div>
                 </div>
             </div>
 
