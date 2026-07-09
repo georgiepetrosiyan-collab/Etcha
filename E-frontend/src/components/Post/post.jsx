@@ -93,13 +93,15 @@ const Post = ({ profile, item, personalData }) => {
     return (
         <Card padding={0}>
             {/* User Profile Header */}
-            <div className='flex gap-3 p-4 pb-2'>
+            <div className='flex gap-3 p-4 pb-2 items-center'>
                 <Link to={`/profile/${item?.user?._id}`} className='w-12 h-12 rounded-4xl'>
                     <img className='rounded-4xl w-12 h-12 border-2 border-white cursor-pointer' src={item?.user?.profilePic} alt="user avatar" />
                 </Link>
                 <div>
                     <div className="text-lg font-semibold">{item?.user?.f_name}</div>
-                    <div className="text-xs text-gray-500">{item?.user?.headline}</div>
+                    {item?.user?.headline != "" && (
+                        <div className="text-xs text-gray-500">{item?.user?.headline}</div>
+                    )}
                 </div>
             </div>
 
