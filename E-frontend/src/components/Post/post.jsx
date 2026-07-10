@@ -201,7 +201,7 @@ const Post = ({ profile, item, personalData, expandComments }) => {
             {/* Comment Section Block */}
             {(comment || expandComments === true) && (
                 <div className='p-4 w-full'>
-                    <form className="w-full flex gap-2" onSubmit={handleSendComment}>
+                    <form className="w-full flex gap-2 pb-4" onSubmit={handleSendComment}>
                         <img src={personalData?.profilePic} className="rounded-full w-12 h-12 border-2 border-white cursor-pointer" alt="avatar" />
                         <input 
                             value={commentText} 
@@ -215,18 +215,18 @@ const Post = ({ profile, item, personalData, expandComments }) => {
                     </form>
 
                     {comments.map((commentItem, index) => (
-                        <div className="w-full p-4" key={commentItem._id || index}>
-                            <div className="py-4">
-                                <Link to={`/profile/${commentItem?.user?._id}`} className='flex gap-3'>
-                                    <img src={commentItem?.user?.profilePic} className="rounded-full w-10 h-10 border-2 border-white cursor-pointer" alt="user avatar" />
-                                    <div className="cursor-pointer">
-                                        <div className="text-md font-semibold">{commentItem?.user?.f_name}</div>
+                        <div className="w-full p-2" key={commentItem._id || index}>
+                            <Link to={`/profile/${commentItem?.user?._id}`} className='flex gap-3 items-center'>
+                                <img src={commentItem?.user?.profilePic} className="rounded-full w-10 h-10 border-2 border-white cursor-pointer" alt="user avatar" />
+                                <div>
+                                    <div className="text-md font-semibold">{commentItem?.user?.f_name}</div>
+                                    {commentItem?.user?.headline != "" && (
                                         <div className="text-sm text-gray-500">{commentItem?.user?.headline}</div>
-                                    </div>
-                                </Link>
-                                <div className="px-11 my-2">
-                                    {commentItem?.comment}
+                                    )}
                                 </div>
+                            </Link>
+                            <div className="my-2">
+                                {commentItem?.comment}
                             </div>
                         </div>
                     ))}
