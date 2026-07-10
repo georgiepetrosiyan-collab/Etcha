@@ -14,6 +14,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 import CommentIcon from '@mui/icons-material/Comment';
 import SendIcon from '@mui/icons-material/Send';
+import UserByline from '../UserByline/userByline';
 
 // TODO update if adding a localization library, which should have proper plural support
 function formatLikes(noOfLikes) {
@@ -216,15 +217,7 @@ const Post = ({ profile, item, personalData, expandComments }) => {
 
                     {comments.map((commentItem, index) => (
                         <div className="w-full p-2" key={commentItem._id || index}>
-                            <Link to={`/profile/${commentItem?.user?._id}`} className='flex gap-3 items-center'>
-                                <img src={commentItem?.user?.profilePic} className="rounded-full w-10 h-10 border-2 border-white cursor-pointer" alt="user avatar" />
-                                <div>
-                                    <div className="text-md font-semibold">{commentItem?.user?.f_name}</div>
-                                    {commentItem?.user?.headline != "" && (
-                                        <div className="text-sm text-gray-500">{commentItem?.user?.headline}</div>
-                                    )}
-                                </div>
-                            </Link>
+                            <UserByline user={commentItem?.user}/>
                             <div className="my-2">
                                 {commentItem?.comment}
                             </div>
