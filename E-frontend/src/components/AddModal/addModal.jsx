@@ -54,11 +54,9 @@ const AddModal = (props) => {
                 {/* FIX 2: Changed value=(desc) to value={desc} */}
                 <textarea 
                     value={desc} 
-                    onChange={(e) => setDesc(e.target.value)} 
-                    cols={50} 
-                    rows={5} 
+                    onChange={(e) => setDesc(e.target.value)}
                     placeholder="What do you want to talk about?" 
-                    className="my-3 outline-0 text-xl p-2"
+                    className="my-3 outline-0 text-xl p-2 w-full h-50"
                 ></textarea>
             </div>
             
