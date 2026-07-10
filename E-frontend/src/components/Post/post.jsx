@@ -25,9 +25,10 @@ function formatComments(noOfComments) {
     return `${noOfComments} comments`
 }
 
-const Post = ({ profile, item, personalData }) => {
+const Post = ({ profile, item, personalData, expandComments }) => {
     const [seeMore, setSeeMore] = useState(false);
     const [comment, setComment] = useState(false);
+    const [commentLoading, setCommentLoading] = useState(false);
     const [comments, setComments] = useState([]);
     const [liked, setLiked] = useState(false);
     const [noOfLikes, setNoOfLike] = useState(item?.likes?.length || 0);
@@ -40,6 +41,36 @@ const Post = ({ profile, item, personalData }) => {
             setLiked(isLikedByUser);
         }
     }, [item?.likes, personalData?._id]);
+
+    // automatically load comments if expandComments is true
+    useEffect(() => {
+        let cancelled = false;
+        console.log("post:",item);
+
+        if (expandComments && item?._id) {
+            async function fetchData() {
+                setCommentLoading(true);
+                try {
+                    const res = await axios.get(`http://localhost:4000/api/comment/${item?._id}`);
+                    console.log(res)
+                    if (res.status != 200) throw new Error('Request failed');
+                    if (!cancelled) setComments(res.data.comments);
+                    setCommentLoading(false);
+                } catch (err) {
+                    if (!cancelled) {
+                        console.error(err);
+                        toast.error('Something Went Wrong');
+                    }
+                }
+            }
+
+            fetchData();
+        }
+
+        return () => {
+            cancelled = true;
+        };
+    }, [expandComments, item?._id]);
 
     const handleSendComment = async (e) => {
         e.preventDefault();
@@ -168,7 +199,7 @@ const Post = ({ profile, item, personalData }) => {
             )}
 
             {/* Comment Section Block */}
-            {comment && (
+            {(comment || expandComments === true) && (
                 <div className='p-4 w-full'>
                     <form className="w-full flex gap-2" onSubmit={handleSendComment}>
                         <img src={personalData?.profilePic} className="rounded-full w-12 h-12 border-2 border-white cursor-pointer" alt="avatar" />
@@ -199,6 +230,12 @@ const Post = ({ profile, item, personalData }) => {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+            {/* Comment Loading Block */}
+            {commentLoading && (
+                <div className='p-4 w-full'>
+                    <p>Loading comments...</p>
                 </div>
             )}
         </Card>

@@ -45,7 +45,7 @@ const SingleActivity = () => {
             {/* middle side */}
             <div className='w-full py-5 sm:w-[50%]'>
                 <div>
-                    <Post item={post} personalData={ownData}/>
+                    <Post item={post} personalData={ownData} expandComments/>
                 </div>
             </div>
 
