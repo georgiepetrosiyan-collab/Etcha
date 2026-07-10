@@ -170,20 +170,18 @@ const Post = ({ profile, item, personalData }) => {
             {/* Comment Section Block */}
             {comment && (
                 <div className='p-4 w-full'>
-                    <div className='flex gap-2 items-center'>
+                    <form className="w-full flex gap-2" onSubmit={handleSendComment}>
                         <img src={personalData?.profilePic} className="rounded-full w-12 h-12 border-2 border-white cursor-pointer" alt="avatar" />
-                        <form className="w-full flex gap-2" onSubmit={handleSendComment}>
-                            <input 
-                                value={commentText} 
-                                onChange={(event) => setCommenttext(event.target.value)}
-                                placeholder="Add a comment..." 
-                                className="w-full border py-5 rounded-3xl hover:bg-gray-100 px-4" 
-                            />
-                            <button type="submit" className='cursor-pointer bg-blue-800 text-white rounded-3xl py-1 px-3'>
-                                Send
-                            </button>
-                        </form>
-                    </div>
+                        <input 
+                            value={commentText} 
+                            onChange={(event) => setCommenttext(event.target.value)}
+                            placeholder="Add a comment..." 
+                            className="w-full border border-gray-500 p-2 rounded-3xl hover:bg-gray-100 px-4" 
+                        />
+                        <button type="submit" className='cursor-pointer bg-[#00827D] text-white rounded-2xl py-1 px-3'>
+                            Send
+                        </button>
+                    </form>
 
                     {comments.map((commentItem, index) => (
                         <div className="w-full p-4" key={commentItem._id || index}>
