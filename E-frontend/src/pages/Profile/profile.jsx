@@ -15,12 +15,13 @@ import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import CreateIcon from '@mui/icons-material/Create';
 import EditIcon from '@mui/icons-material/Edit';
 
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 
 const Profile = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [imageSetModal, setImageModal] = useState(false);
     const [circularImage, setCircularImage] = useState(true);
@@ -112,9 +113,6 @@ const Profile = () => {
         });
     }
 
-    // FIX: use .toString() comparisons instead of === since these are
-    // Mongo ObjectId objects (or a mix of ObjectId/string), which never
-    // strictly-equal each other even when they represent the same ID.
     const amIfriend = () => {
         let arr = userData?.friends?.filter((item) => item?.toString() === ownData?._id?.toString());
         return arr?.length;
@@ -296,9 +294,13 @@ const Profile = () => {
                                 {
                                     postData.map((item, ind) => {
                                         return (
-                                            <Link key={item?._id || ind} to={`/profile/${id}/activities/${item?._id}`} className="cursor-pointer shrink-0 w-88 h-140">
+                                            <div
+                                                key={item?._id || ind}
+                                                onClick={() => navigate(`/profile/${id}/activities/${item?._id}`)}
+                                                className="cursor-pointer shrink-0 w-88 h-140"
+                                            >
                                                 <Post profile={1} item={item} personalData={ownData} />
-                                            </Link>
+                                            </div>
                                         )
                                     })
                                 }

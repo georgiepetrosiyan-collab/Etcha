@@ -15,6 +15,7 @@ const NotificationRoutes = require('./routes/notification');
 const CommentRoutes = require('./routes/comment');
 const ConversationRoutes = require('./routes/conversation');
 const MessageRoutes = require('./routes/message');
+const JobRoutes = require('./routes/job');
 
 // 2. Database Connection
 require('./connection');
@@ -70,6 +71,7 @@ app.use('/api/notification', NotificationRoutes);
 app.use('/api/comment', CommentRoutes);
 app.use('/api/conversation', ConversationRoutes);
 app.use('/api/message', MessageRoutes);
+app.use('/api/job', JobRoutes);
 
 // 9. Global Error Handling Middleware
 app.use((err, req, res, next) => {

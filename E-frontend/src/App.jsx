@@ -10,12 +10,12 @@ import LandingPage from "./pages/LandingPage/landingPage";
 import Profile from './pages/Profile/profile';
 import Feeds from './pages/Feeds/feeds';
 import MyNetwork from './pages/MyNetwork/myNetwork';
-import Job from './pages/Job/job';
 
 import Messages from './pages/Messages/messages';
 import Notification from './pages/Notification/notification';
 import AllActivities from './pages/AllActivities/allActivities';
 import SingleActivity from './pages/SingleActivity/singleActivity';
+import Job from './pages/Job/job';
 
 function App() {
   const [isLogin, setIsLogin] = useState(localStorage.getItem('isLogin') === 'true');
@@ -63,7 +63,9 @@ function App() {
         <Route path="/login" element={isLogin ? <Navigate to="/feeds" /> : <Login changeLoginValue={changeLoginValue} />} />
         <Route path="/feeds" element={isLogin ? <Feeds /> : <Navigate to="/login" />} />
         <Route path="/myNetwork" element={isLogin ? <MyNetwork /> : <Navigate to="/login" />} />
-        <Route path="/jobs" element={isLogin ? <Job /> : <Navigate to="/login" />} />
+        <Route path="/job" element={isLogin ? <Job /> : <Navigate to="/login" />} />
+        <Route path="/job/:jobId" element={isLogin ? <Job /> : <Navigate to="/login" />} />
+
         <Route path="/messages" element={isLogin ? <Messages /> : <Navigate to="/login" />} /> 
         <Route path="/notification" element={isLogin ? <Notification /> : <Navigate to="/login" />} />
         <Route path="/profile/:id" element={isLogin ? <Profile /> : <Navigate to="/login" />} />

@@ -28,13 +28,14 @@ const Notification = () => {
         try {
             await axios.put(`${API_BASE_URL}/notification/isRead`, { notificationId: item._id }, { withCredentials: true });
             
-            // Optimistically update the UI to show it's read
             setNotifications(prev => 
                 prev.map(notif => notif._id === item._id ? { ...notif, isRead: true } : notif)
             );
 
             if (item.type === "comment" && item.postId) {
                 navigate(`/profile/${ownData?._id}/activities/${item.postId}`);
+            } else if (item.type === "jobReferral" && item.jobId) {
+                navigate(`/job/${item.jobId}`);
             } else {
                 navigate("/myNetwork");
             }
