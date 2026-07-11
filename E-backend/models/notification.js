@@ -20,7 +20,7 @@ const NotificationSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true,
-        enum: ['friendRequest', 'comment']
+        enum: ['friendRequest', 'comment', 'jobReferral']
     },
     isRead: {
         type: Boolean,
@@ -29,6 +29,10 @@ const NotificationSchema = new mongoose.Schema({
     postId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'post'
+    },
+    jobId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'job'
     }
 }, { timestamps: true });
 

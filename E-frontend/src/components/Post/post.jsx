@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import toast from 'react-hot-toast'; // Ensure this package is installed
+import toast from 'react-hot-toast';
 import Card from '../Card/card';
 import MovieIcon from '@mui/icons-material/Movie';
 import PhotoIcon from '@mui/icons-material/Photo';
@@ -42,7 +42,7 @@ const Post = ({ profile, item, personalData }) => {
             }, { withCredentials: true });
             
             setComments([res.data.comment, ...comments]);
-            setCommenttext(""); // Clear input on success
+            setCommenttext("");
         } catch (err) {
             console.error(err);
             toast.error('Something Went Wrong');
@@ -67,7 +67,7 @@ const Post = ({ profile, item, personalData }) => {
 
     const handleCommentBoxOpenClose = async () => {
         setComment(!comment);
-        if (!comment) { // Only fetch if we are opening it
+        if (!comment) {
             try {
                 const resp = await axios.get(`http://localhost:4000/api/comment/${item?._id}`);
                 setComments(resp.data.comments);
@@ -94,7 +94,11 @@ const Post = ({ profile, item, personalData }) => {
         <Card padding={0}>
             {/* User Profile Header */}
             <div className='flex gap-3 p-4'>
-                <Link to={`/profile/${item?.user?._id}`} className='w-12 h-12 rounded-4xl'>
+                <Link
+                    to={`/profile/${item?.user?._id}`}
+                    className='w-12 h-12 rounded-4xl'
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <img className='rounded-4xl w-12 h-12 border-2 border-white cursor-pointer' src={item?.user?.profilePic} alt="user avatar" />
                 </Link>
                 <div>
@@ -176,7 +180,11 @@ const Post = ({ profile, item, personalData }) => {
                     {comments.map((commentItem, index) => (
                         <div className="w-full p-4" key={commentItem._id || index}>
                             <div className="py-4">
-                                <Link to={`/profile/${commentItem?.user?._id}`} className='flex gap-3'>
+                                <Link
+                                    to={`/profile/${commentItem?.user?._id}`}
+                                    className='flex gap-3'
+                                    onClick={(e) => e.stopPropagation()}
+                                >
                                     <img src={commentItem?.user?.profilePic} className="rounded-full w-10 h-10 border-2 border-white cursor-pointer" alt="user avatar" />
                                     <div className="cursor-pointer">
                                         <div className="text-md font-semibold">{commentItem?.user?.f_name}</div>
