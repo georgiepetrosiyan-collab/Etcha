@@ -109,12 +109,12 @@ const Navbar_2 = () => {
                         </div>
                     </Link>
 
-                    <div className="flex flex-col items-center cursor-pointer">
-                        <WorkIcon sx={{ color: location.pathname === "/resume" ? "black" : "gray" }} />
-                        <div className={`text-sm text-gray-500 ${location.pathname === "/resume" ? "border-b-3 " : ""}`}>
+                    <Link to="/jobs" className="flex flex-col items-center cursor-pointer">
+                        <WorkIcon sx={{ color: location.pathname === "/jobs" ? "black" : "gray" }} />
+                        <div className={`text-sm text-gray-500 ${location.pathname === "/jobs" ? "border-b-3 " : ""}`}>
                             Job
                         </div>
-                    </div>
+                    </Link>
 
                     <Link to="/messages" className="flex flex-col items-center cursor-pointer">
                         <ForumIcon sx={{ color: location.pathname === "/messages" ? "black" : "gray" }} />
@@ -125,7 +125,7 @@ const Navbar_2 = () => {
 
                     <Link to={"/notification"} className="flex flex-col items-center cursor-pointer">
                         {/* FIX 7: Used notificationCount state instead of hardcoded "1" */}
-                        <div><NotificationsIcon sx={{ color: location.pathname === "/notification" ? "black" : "gray" }} /> {notificationCount>0 && <span className="p-1 rounded-full text-sm bg-red-700 text-white">{notificationCount}</span>}</div>
+                        <div><NotificationsIcon sx={{ color: location.pathname === "/notification" ? "black" : "gray" }} /> {notificationCount > 0 && <span className="p-1 rounded-full text-sm bg-red-700 text-white">{notificationCount}</span>}</div>
                         <div className={`text-sm text-gray-500 ${location.pathname === "/notification" ? "border-b-3 " : ""}`}>
                             Notification
                         </div>
