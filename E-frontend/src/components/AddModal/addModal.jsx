@@ -70,7 +70,9 @@ const AddModal = (props) => {
                     <label className="cursor-pointer" htmlFor="inputFile"><ImageIcon /></label>
                     <input onChange={handleUploadImage} type="file" className="hidden" id="inputFile" />
                 </div>
-                <div className="cursor-pointer bg-[#00827D] text-white rounded-full py-2 px-6" onClick={handlePost}> Post</div>
+                <div className={`cursor-pointer ${desc == "" ? "bg-gray-500" : "bg-accent"} text-white rounded-full py-2 px-6`} onClick={
+                  desc == "" ? undefined : handlePost
+                }> Post</div>
             </div>
             <ToastContainer />
         </div>
