@@ -29,7 +29,7 @@ const AddModal = (props) => {
         const files = e.target.files;
         const data = new FormData();
         data.append('file', files[0]);
-        
+
         data.append('upload_preset', 'etchacloud');
         try {
             const response = await axios.post("https://api.cloudinary.com/v1_1/dmkqcilgq/image/upload", data);
@@ -45,21 +45,20 @@ const AddModal = (props) => {
         <div className=''>
             <div className="flex gap-4 items-center">
                 <div className="relative">
-                    <img className="w-15 h-15 rounded-full" alt="img" src={props.personalData?.profilePic} />
+                    <img className="w-10 h-10 rounded-full" alt="img" src={props.personalData?.profilePic} />
                 </div>
-                <div className="text-2xl">{props.personalData?.f_name} </div>
             </div>
 
             <div>
                 {/* FIX 2: Changed value=(desc) to value={desc} */}
-                <textarea 
-                    value={desc} 
+                <textarea
+                    value={desc}
                     onChange={(e) => setDesc(e.target.value)}
-                    placeholder="What do you want to talk about?" 
+                    placeholder="What do you want to talk about?"
                     className="my-3 outline-0 text-xl p-2 w-full h-50"
                 ></textarea>
             </div>
-            
+
             {
                 imageUrl && <div>
                     <img className="w-20 h-20 rounded-xl" src={imageUrl} />
