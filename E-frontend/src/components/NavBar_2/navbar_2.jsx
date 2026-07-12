@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import "./navbar2.css"
-import axios from 'axios'  // FIX 1: Missing axios import
+import axios from 'axios'
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import WorkIcon from '@mui/icons-material/Work';
@@ -36,7 +36,6 @@ const Navbar_2 = () => {
     }, [debouncedTerm]);
 
     const searchAPICall = async () => {
-        // FIX 2: Changed single quotes to backticks for template literal
         await axios.get(`http://localhost:4000/api/auth/findUser?query=${debouncedTerm}`, { withCredentials: true }).then(res => {
             console.log(res)
             setSearchUser(res.data.users)
@@ -62,10 +61,6 @@ const Navbar_2 = () => {
         fetchNotification()
     }, [])
 
-    // FIX 3: Removed duplicate useEffect that also fetched userData
-
-    console.log(location)
-
     return (
         <div className="bg-white h-13 flex justify-between py-1 px-5 xl:px-50 fixed top-0 w-full z-1000">
             <div className="flex gap-2 items-center">
@@ -79,10 +74,8 @@ const Navbar_2 = () => {
 
                     {searchUser.length > 0 && debouncedTerm.length !== 0 &&
                         <div className="absolute w-88 left-0 bg-gray-200">
-                            {/* FIX 4: Changed .atmap() to .map() */}
                             {searchUser.map((item, index) => {
                                 return (
-                                    // FIX 5: Fixed template literal syntax — was missing backtick and had malformed closing brace
                                     <Link to={`/profile/${item?._id}`} key={index} className='flex gap-2 mb-1 items-center cursor-pointer' onClick={() => setSearchTerm("")}>
                                         <div><img className="w-10 h-10 rounded-full" src={item?.profilePic} alt="profile" /></div>
                                         <div>{item?.f_name}</div>
@@ -91,7 +84,7 @@ const Navbar_2 = () => {
                             })}
                         </div>
                     }
-                </div>  {/* FIX 6: Added missing closing </div> for the relative wrapper */}
+                </div>
 
                 <div className="hidden gap-10 md:flex">
 
@@ -109,12 +102,12 @@ const Navbar_2 = () => {
                         </div>
                     </Link>
 
-                    <div className="flex flex-col items-center cursor-pointer">
-                        <WorkIcon sx={{ color: location.pathname === "/resume" ? "black" : "gray" }} />
-                        <div className={`text-sm text-gray-500 ${location.pathname === "/resume" ? "border-b-3 " : ""}`}>
+                    <Link to="/job" className="flex flex-col items-center cursor-pointer">
+                        <WorkIcon sx={{ color: location.pathname === "/job" ? "black" : "gray" }} />
+                        <div className={`text-sm text-gray-500 ${location.pathname === "/job" ? "border-b-3 " : ""}`}>
                             Job
                         </div>
-                    </div>
+                    </Link>
 
                     <Link to="/messages" className="flex flex-col items-center cursor-pointer">
                         <ForumIcon sx={{ color: location.pathname === "/messages" ? "black" : "gray" }} />
@@ -124,14 +117,12 @@ const Navbar_2 = () => {
                     </Link>
 
                     <Link to={"/notification"} className="flex flex-col items-center cursor-pointer">
-                        {/* FIX 7: Used notificationCount state instead of hardcoded "1" */}
                         <div><NotificationsIcon sx={{ color: location.pathname === "/notification" ? "black" : "gray" }} /> {notificationCount>0 && <span className="p-1 rounded-full text-sm bg-red-700 text-white">{notificationCount}</span>}</div>
                         <div className={`text-sm text-gray-500 ${location.pathname === "/notification" ? "border-b-3 " : ""}`}>
                             Notification
                         </div>
                     </Link>
 
-                    {/* FIX 8: Fixed template literal syntax — was using regular quotes instead of backticks */}
                     <Link to={`/profile/${userData?._id}`} className="flex flex-col items-center cursor-pointer">
                         <img className="w-8 h-8 rounded-full" src={userData?.profilePic} alt="profile" />
                         <div className="text-sm text-gray-500">Me</div>
@@ -140,7 +131,7 @@ const Navbar_2 = () => {
                 </div>
 
             </div>
-        </div>  // FIX 9: Replaced misplaced ) with </div> to properly close the outer wrapper
+        </div>
     )
 }
 

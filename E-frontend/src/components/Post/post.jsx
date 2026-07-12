@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import toast from 'react-hot-toast'; // Ensure this package is installed
+import toast from 'react-hot-toast';
 import Card from '../Card/card';
 import MovieIcon from '@mui/icons-material/Movie';
 import PhotoIcon from '@mui/icons-material/Photo';
@@ -84,7 +84,7 @@ const Post = ({ profile, item, personalData, expandComments }) => {
             }, { withCredentials: true });
             
             setComments([res.data.comment, ...comments]);
-            setCommenttext(""); // Clear input on success
+            setCommenttext("");
         } catch (err) {
             console.error(err);
             toast.error('Something Went Wrong');
@@ -109,7 +109,7 @@ const Post = ({ profile, item, personalData, expandComments }) => {
 
     const handleCommentBoxOpenClose = async () => {
         setComment(!comment);
-        if (!comment) { // Only fetch if we are opening it
+        if (!comment) {
             try {
                 const resp = await axios.get(`http://localhost:4000/api/comment/${item?._id}`);
                 setComments(resp.data.comments);
@@ -136,7 +136,11 @@ const Post = ({ profile, item, personalData, expandComments }) => {
         <Card padding={0}>
             {/* User Profile Header */}
             <div className='flex gap-3 p-4 pb-2 items-center'>
-                <Link to={`/profile/${item?.user?._id}`} className='w-12 h-12 rounded-4xl'>
+                <Link
+                    to={`/profile/${item?.user?._id}`}
+                    className='w-12 h-12 rounded-4xl'
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <img className='rounded-4xl w-12 h-12 border-2 border-white cursor-pointer' src={item?.user?.profilePic} alt="user avatar" />
                 </Link>
                 <div>
@@ -218,7 +222,7 @@ const Post = ({ profile, item, personalData, expandComments }) => {
                     {comments.map((commentItem, index) => (
                         <div className="w-full p-2" key={commentItem._id || index}>
                             <UserByline user={commentItem?.user}/>
-                            <div className="my-2">
+                            <div className="px-11 my-2">
                                 {commentItem?.comment}
                             </div>
                         </div>
