@@ -3,7 +3,7 @@
 import React,{useState,useEffect} from 'react'
 
 import Card from '../Card/card'
-import { Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 const Advertisement = () => {
 
@@ -29,7 +29,9 @@ const Advertisement = () => {
                 <div className='px-5 my-5 mx-auto'>
                     <div className="text-sm font-semibold text-center">{userData?.f_name}</div>
                     <div className="text-sm my-3 text-center">Get the latest jobs and industry news</div>
-                    <div className="text-sm my-1 border text-center p-2 rounded-2xl font-bold text-white bg-accent cursor-pointer">Explore</div>
+                    <Link to={"/job"}>
+                        <div className="text-sm my-1 border text-center p-2 rounded-2xl font-bold text-white bg-accent cursor-pointer">Explore</div>
+                    </Link>
                 </div>
             </Card>
         </div>
