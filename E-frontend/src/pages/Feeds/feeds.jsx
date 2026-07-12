@@ -61,12 +61,12 @@ const Feeds = () => {
                     <Card padding={1}>
                         <div className="w-full flex justify-between">
                             <div>Profile views:</div>
-                            <div className="text-blue-900">0</div>
+                            <div className="text-accent-darker">0</div>
                         </div>
 
                         <div className="w-full flex justify-between">
                             <div>Post Impressions:</div>
-                            <div className="text-blue-900">0</div>
+                            <div className="text-accent-darker">0</div>
                         </div>
                     </Card>
                 </div>
