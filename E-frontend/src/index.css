@@ -5,3 +5,10 @@ body {
   padding:0;
   box-sizing: border-box;
 }
+
+/* etcha colors */
+@theme {
+  --color-accent: #00827D;
+  --color-accent-darker: #005e5a;
+  --color-accent-lighter: #00a69f;
+}

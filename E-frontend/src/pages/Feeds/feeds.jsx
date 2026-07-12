@@ -1,4 +1,4 @@
-//E/E-frontend/pages/Feeds/feeds.jsx 
+//E/E-frontend/pages/Feeds/feeds.jsx
 
 import React, { useState, useEffect } from 'react';
 import ProfileCard from '../../components/ProfileCard/profileCard'
@@ -61,12 +61,12 @@ const Feeds = () => {
                     <Card padding={1}>
                         <div className="w-full flex justify-between">
                             <div>Profile views:</div>
-                            <div className="text-blue-900">0</div>
+                            <div className="text-accent-darker">0</div>
                         </div>
 
                         <div className="w-full flex justify-between">
                             <div>Post Impressions:</div>
-                            <div className="text-blue-900">0</div>
+                            <div className="text-accent-darker">0</div>
                         </div>
                     </Card>
                 </div>
@@ -78,13 +78,13 @@ const Feeds = () => {
                     <Card padding={1}>
                         <div className='flex gap-2 items-center'>
                             <img src={personalData?.profilePic || ''} className="rounded-4xl w-13 border-2 border-white cursor-pointer" alt="profile" />
-                            <div onClick= {()=>setAddPostModal(true)} className="w-full border py-3 rounded-3xl cursor-pointer hover:bg-gray-100 text-center">Start a post</div>
+                            <div onClick= {()=>setAddPostModal(true)} className="w-full border border-gray-400 text-gray-400 py-3 rounded-3xl cursor-pointer hover:bg-gray-100 text-center">Start a post</div>
                         </div>
 
                         <div className="w-full flex mt-3">
 
                             <div onClick= {()=>setAddPostModal(true)} className="flex gap-2 p-2 cursor-pointer justify-center rounded-lg w-[33%] hover:bg-gray-100 items-center">
-                                <MovieIcon sx={{ color: '#005e5a' }} />Video
+                                <MovieIcon sx={{ color: '#00827D' }} />Video
                             </div>
 
                             <div onClick= {()=>setAddPostModal(true)} className="flex gap-2 p-2 cursor-pointer justify-center rounded-lg w-[33%] hover:bg-gray-100 items-center">
@@ -92,11 +92,11 @@ const Feeds = () => {
                             </div>
 
                             <div onClick= {()=>setAddPostModal(true)} className="flex gap-2 p-2 cursor-pointer justify-center rounded-lg w-[33%] hover:bg-gray-100 items-center">
-                                <FeedIcon sx={{ color: '#00a69f' }} />Article
+                                <FeedIcon sx={{ color: '#00827D' }} />Article
                             </div>
 
                         </div>
-                    </Card> 
+                    </Card>
                 </div>
 
                 <div className="border-b border-gray-400 w-full my-5">

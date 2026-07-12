@@ -14,10 +14,22 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 import CommentIcon from '@mui/icons-material/Comment';
 import SendIcon from '@mui/icons-material/Send';
+import UserByline from '../UserByline/userByline';
 
-const Post = ({ profile, item, personalData }) => {
+// TODO update if adding a localization library, which should have proper plural support
+function formatLikes(noOfLikes) {
+    if (noOfLikes == 1) return `${noOfLikes} like`
+    return `${noOfLikes} likes`
+}
+function formatComments(noOfComments) {
+    if (noOfComments == 1) return `${noOfComments} comment`
+    return `${noOfComments} comments`
+}
+
+const Post = ({ profile, item, personalData, expandComments }) => {
     const [seeMore, setSeeMore] = useState(false);
     const [comment, setComment] = useState(false);
+    const [commentLoading, setCommentLoading] = useState(false);
     const [comments, setComments] = useState([]);
     const [liked, setLiked] = useState(false);
     const [noOfLikes, setNoOfLike] = useState(item?.likes?.length || 0);
@@ -30,6 +42,36 @@ const Post = ({ profile, item, personalData }) => {
             setLiked(isLikedByUser);
         }
     }, [item?.likes, personalData?._id]);
+
+    // automatically load comments if expandComments is true
+    useEffect(() => {
+        let cancelled = false;
+        console.log("post:",item);
+
+        if (expandComments && item?._id) {
+            async function fetchData() {
+                setCommentLoading(true);
+                try {
+                    const res = await axios.get(`http://localhost:4000/api/comment/${item?._id}`);
+                    console.log(res)
+                    if (res.status != 200) throw new Error('Request failed');
+                    if (!cancelled) setComments(res.data.comments);
+                    setCommentLoading(false);
+                } catch (err) {
+                    if (!cancelled) {
+                        console.error(err);
+                        toast.error('Something Went Wrong');
+                    }
+                }
+            }
+
+            fetchData();
+        }
+
+        return () => {
+            cancelled = true;
+        };
+    }, [expandComments, item?._id]);
 
     const handleSendComment = async (e) => {
         e.preventDefault();
@@ -93,7 +135,7 @@ const Post = ({ profile, item, personalData }) => {
     return (
         <Card padding={0}>
             {/* User Profile Header */}
-            <div className='flex gap-3 p-4'>
+            <div className='flex gap-3 p-4 pb-2 items-center'>
                 <Link
                     to={`/profile/${item?.user?._id}`}
                     className='w-12 h-12 rounded-4xl'
@@ -103,14 +145,16 @@ const Post = ({ profile, item, personalData }) => {
                 </Link>
                 <div>
                     <div className="text-lg font-semibold">{item?.user?.f_name}</div>
-                    <div className="text-xs text-gray-500">{item?.user?.headline}</div>
+                    {item?.user?.headline != "" && (
+                        <div className="text-xs text-gray-500">{item?.user?.headline}</div>
+                    )}
                 </div>
             </div>
 
             {/* Post Description Text Block */}
-            <div className='text-md p-4 my-3 whitespace-pre-line grow'>
-                {seeMore ? desc : desc?.length > 50 ? `${desc.slice(0, 50)}...` : `${desc.slice(0, 50)}`}
-                {desc?.length > 50 && (
+            <div className='text-md px-4 py-2 whitespace-pre-line grow'>
+                {seeMore ? desc : desc?.length > 100 ? `${desc.slice(0, 100)}...` : `${desc.slice(0, 100)}`}
+                {desc?.length > 100 && (
                     <span onClick={() => setSeeMore(prev => !prev)} className="cursor-pointer text-gray-500 font-medium">
                         {seeMore ? " See Less" : " See More"}
                     </span>
@@ -125,17 +169,17 @@ const Post = ({ profile, item, personalData }) => {
             )}
 
             {/* Engagement Row Status Bar */}
-            <div className='my-2 p-4 flex justify-between items-center'>
+            <div className='px-4 py-2 flex justify-between items-center'>
                 {!profile && (
                     <div className='flex gap-1 items-center'>
-                        <ThumbUpIcon sx={{ color: "blue", fontSize: 14 }} />
-                        <div className='text-sm text-gray-600'>{noOfLikes} Likes</div>
+                        <ThumbUpIcon sx={{ fontSize: 14 }} className="text-gray-600" />
+                        <div className='text-sm text-gray-600'>{formatLikes(noOfLikes)}</div>
                     </div>
                 )}
 
                 {/* Right side: Comments Counter */}
                 <div className='flex gap-1 items-center'>
-                    <div className='text-sm text-gray-600'>{item?.comments || item?.comment?.length || 0} Comments</div>
+                    <div className='text-sm text-gray-600'>{formatComments(item?.comments || item?.comment?.length || 0)}</div>
                 </div>
             </div>
 
@@ -143,7 +187,7 @@ const Post = ({ profile, item, personalData }) => {
             {!profile && (
                 <div className="flex p-1">
                     <div onClick={handleLikeFunc} className="w-[33%] justify-center flex gap-2 items-center border-r border-gray-100 p-2 cursor-pointer hover:bg-gray-100">
-                        {liked ? <ThumbUpIcon sx={{ fontSize: 22, color: "blue" }} /> : <ThumbUpOutlinedIcon sx={{ fontSize: 22 }} />}
+                        {liked ? <ThumbUpIcon sx={{ fontSize: 22, color: "#00827D" }} /> : <ThumbUpOutlinedIcon sx={{ fontSize: 22 }} />}
                         <span>{liked ? 'Liked' : "Like"}</span>
                     </div>
 
@@ -160,43 +204,35 @@ const Post = ({ profile, item, personalData }) => {
             )}
 
             {/* Comment Section Block */}
-            {comment && (
+            {(comment || expandComments === true) && (
                 <div className='p-4 w-full'>
-                    <div className='flex gap-2 items-center'>
+                    <form className="w-full flex gap-2 pb-4" onSubmit={handleSendComment}>
                         <img src={personalData?.profilePic} className="rounded-full w-12 h-12 border-2 border-white cursor-pointer" alt="avatar" />
-                        <form className="w-full flex gap-2" onSubmit={handleSendComment}>
-                            <input 
-                                value={commentText} 
-                                onChange={(event) => setCommenttext(event.target.value)}
-                                placeholder="Add a comment..." 
-                                className="w-full border py-5 rounded-3xl hover:bg-gray-100 px-4" 
-                            />
-                            <button type="submit" className='cursor-pointer bg-blue-800 text-white rounded-3xl py-1 px-3'>
-                                Send
-                            </button>
-                        </form>
-                    </div>
+                        <input 
+                            value={commentText} 
+                            onChange={(event) => setCommenttext(event.target.value)}
+                            placeholder="Add a comment..." 
+                            className="w-full border border-gray-500 p-2 rounded-3xl hover:bg-gray-100 px-4" 
+                        />
+                        <button type="submit" className='cursor-pointer bg-[#00827D] text-white rounded-2xl py-1 px-3'>
+                            Send
+                        </button>
+                    </form>
 
                     {comments.map((commentItem, index) => (
-                        <div className="w-full p-4" key={commentItem._id || index}>
-                            <div className="py-4">
-                                <Link
-                                    to={`/profile/${commentItem?.user?._id}`}
-                                    className='flex gap-3'
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <img src={commentItem?.user?.profilePic} className="rounded-full w-10 h-10 border-2 border-white cursor-pointer" alt="user avatar" />
-                                    <div className="cursor-pointer">
-                                        <div className="text-md font-semibold">{commentItem?.user?.f_name}</div>
-                                        <div className="text-sm text-gray-500">{commentItem?.user?.headline}</div>
-                                    </div>
-                                </Link>
-                                <div className="px-11 my-2">
-                                    {commentItem?.comment}
-                                </div>
+                        <div className="w-full p-2" key={commentItem._id || index}>
+                            <UserByline user={commentItem?.user}/>
+                            <div className="px-11 my-2">
+                                {commentItem?.comment}
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+            {/* Comment Loading Block */}
+            {commentLoading && (
+                <div className='p-4 w-full'>
+                    <p>Loading comments...</p>
                 </div>
             )}
         </Card>

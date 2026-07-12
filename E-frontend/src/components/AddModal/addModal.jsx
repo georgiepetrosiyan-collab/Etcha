@@ -29,7 +29,7 @@ const AddModal = (props) => {
         const files = e.target.files;
         const data = new FormData();
         data.append('file', files[0]);
-        
+
         data.append('upload_preset', 'etchacloud');
         try {
             const response = await axios.post("https://api.cloudinary.com/v1_1/dmkqcilgq/image/upload", data);
@@ -45,23 +45,20 @@ const AddModal = (props) => {
         <div className=''>
             <div className="flex gap-4 items-center">
                 <div className="relative">
-                    <img className="w-15 h-15 rounded-full" alt="img" src={props.personalData?.profilePic} />
+                    <img className="w-10 h-10 rounded-full" alt="img" src={props.personalData?.profilePic} />
                 </div>
-                <div className="text-2xl">{props.personalData?.f_name} </div>
             </div>
 
             <div>
                 {/* FIX 2: Changed value=(desc) to value={desc} */}
-                <textarea 
-                    value={desc} 
-                    onChange={(e) => setDesc(e.target.value)} 
-                    cols={50} 
-                    rows={5} 
-                    placeholder="What do you want to talk about?" 
-                    className="my-3 outline-0 text-xl p-2"
+                <textarea
+                    value={desc}
+                    onChange={(e) => setDesc(e.target.value)}
+                    placeholder="What do you want to talk about?"
+                    className="my-3 outline-0 text-xl p-2 w-full h-50 resize-none"
                 ></textarea>
             </div>
-            
+
             {
                 imageUrl && <div>
                     <img className="w-20 h-20 rounded-xl" src={imageUrl} />
@@ -69,11 +66,13 @@ const AddModal = (props) => {
             }
 
             <div className='flex justify-between items-center'>
-                <div className="my-6">
+                <div className="my-4">
                     <label className="cursor-pointer" htmlFor="inputFile"><ImageIcon /></label>
                     <input onChange={handleUploadImage} type="file" className="hidden" id="inputFile" />
                 </div>
-                <div className="bg-blue-950 text-white py-1 px-3 cursor-pointer rounded-2xl h-fit" onClick={handlePost}> Post</div>
+                <div className={`cursor-pointer ${desc == "" ? "bg-gray-500" : "bg-accent"} text-white rounded-full py-2 px-6`} onClick={
+                  desc == "" ? undefined : handlePost
+                }> Post</div>
             </div>
             <ToastContainer />
         </div>

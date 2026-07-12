@@ -40,30 +40,20 @@ const SingleActivity = () => {
                 <div className='h-fit'>
                     <ProfileCard data={post?.user} />
                 </div>
-
-
-
             </div>
 
             {/* middle side */}
-            <div className='w-full py-5 sm:w-[50%] '>
-
+            <div className='w-full py-5 sm:w-[50%]'>
                 <div>
-                    <Post item={post} personalData={ownData}/>
+                    <Post item={post} personalData={ownData} expandComments/>
                 </div>
-
-
             </div>
 
             {/* right side */}
             <div className='w-[26%] py-5 hidden md:block'>
-
-
-
                 <div className='my-5 sticky top-19'>
                     <Advertisement />
                 </div>
-
             </div>
 
         </div>
