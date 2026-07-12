@@ -55,7 +55,7 @@ const AddModal = (props) => {
                     value={desc}
                     onChange={(e) => setDesc(e.target.value)}
                     placeholder="What do you want to talk about?"
-                    className="my-3 outline-0 text-xl p-2 w-full h-50"
+                    className="my-3 outline-0 text-xl p-2 w-full h-50 resize-none"
                 ></textarea>
             </div>
 
