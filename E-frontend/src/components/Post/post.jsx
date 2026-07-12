@@ -149,8 +149,8 @@ const Post = ({ profile, item, personalData, expandComments }) => {
 
             {/* Post Description Text Block */}
             <div className='text-md px-4 py-2 whitespace-pre-line grow'>
-                {seeMore ? desc : desc?.length > 50 ? `${desc.slice(0, 50)}...` : `${desc.slice(0, 50)}`}
-                {desc?.length > 50 && (
+                {seeMore ? desc : desc?.length > 100 ? `${desc.slice(0, 100)}...` : `${desc.slice(0, 100)}`}
+                {desc?.length > 100 && (
                     <span onClick={() => setSeeMore(prev => !prev)} className="cursor-pointer text-gray-500 font-medium">
                         {seeMore ? " See Less" : " See More"}
                     </span>
