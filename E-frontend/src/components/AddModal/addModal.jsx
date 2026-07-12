@@ -66,11 +66,11 @@ const AddModal = (props) => {
             }
 
             <div className='flex justify-between items-center'>
-                <div className="my-6">
+                <div className="my-4">
                     <label className="cursor-pointer" htmlFor="inputFile"><ImageIcon /></label>
                     <input onChange={handleUploadImage} type="file" className="hidden" id="inputFile" />
                 </div>
-                <div className="bg-blue-950 text-white py-1 px-3 cursor-pointer rounded-2xl h-fit" onClick={handlePost}> Post</div>
+                <div className="cursor-pointer bg-[#00827D] text-white rounded-full py-2 px-6" onClick={handlePost}> Post</div>
             </div>
             <ToastContainer />
         </div>
