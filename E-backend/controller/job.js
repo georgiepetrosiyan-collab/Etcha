@@ -1,11 +1,37 @@
-//E/E-backend/controller/job.js
+// E/E-backend/controller/job.js
 
 const Job = require('../models/job');
 const User = require('../models/user');
 const Referral = require('../models/referral');
 const NotificationModel = require('../models/notification');
-const { computeMatchScore } = require('../utils/matchScore');
+
+// Imported ATS and match score utilities
+const { computeMatchScore, computeATSAnalysis } = require('../utils/matchScore');
 const { generateResumeForUser } = require('../utils/generateResume');
+
+// Applications scoring below this ATS keyword-match percentage are
+// automatically rejected — the applicant is notified immediately.
+const ATS_REJECT_THRESHOLD = 30;
+
+exports.checkATS = async (req, res) => {
+    try {
+        const { cv, job } = req.body;
+
+        if (!cv || !job) {
+            return res.status(400).json({ error: "CV and job data are required" });
+        }
+
+        const analysis = computeATSAnalysis(cv, job);
+
+        return res.status(200).json({
+            message: "ATS analysis complete",
+            analysis
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error', message: err.message });
+    }
+}
 
 exports.getAllJobs = async (req, res) => {
     try {
@@ -42,64 +68,6 @@ exports.getAllJobs = async (req, res) => {
             availableJobs,
             myJobs
         });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error', message: err.message });
-    }
-}
-
-exports.referConnection = async (req, res) => {
-    try {
-        const { jobId, connectionId } = req.body;
-        const selfId = req.user._id;
-
-        if (!jobId || !connectionId) {
-            return res.status(400).json({ error: "Job ID and connection ID are required" });
-        }
-
-        const job = await Job.findById(jobId);
-        if (!job) {
-            return res.status(404).json({ error: "Job not found" });
-        }
-
-        const isFriend = req.user.friends.some(id => id.toString() === connectionId.toString());
-        if (!isFriend) {
-            return res.status(400).json({ error: "You can only refer your connections" });
-        }
-
-        const alreadyReferred = await Referral.findOne({ job: jobId, referrer: selfId, referredUser: connectionId });
-        if (alreadyReferred) {
-            return res.status(400).json({ error: "You already referred this connection to this job" });
-        }
-
-        const referredUserDoc = await User.findById(connectionId);
-        if (!referredUserDoc) {
-            return res.status(404).json({ error: "Connection not found" });
-        }
-
-        let cv = undefined;
-        const { matchPercentage } = computeMatchScore(referredUserDoc, job);
-        try {
-            cv = await generateResumeForUser(referredUserDoc, job);
-        } catch (genErr) {
-            console.error("Auto-CV generation for referral failed:", genErr.message);
-        }
-
-        const referral = new Referral({
-            job: jobId,
-            referrer: selfId,
-            referredUser: connectionId,
-            cv,
-            matchPercentage
-        });
-        await referral.save();
-
-        const content = `${req.user.f_name} referred you for a job: ${job.title} at ${job.company}`;
-        await new NotificationModel({
-            sender: selfId, receiver: connectionId, content, type: "jobReferral", jobId: job._id
-        }).save();
-
-        return res.status(200).json({ message: "Referral sent successfully" });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Server error', message: err.message });
@@ -176,10 +144,18 @@ exports.applyToJob = async (req, res) => {
             return res.status(400).json({ error: "You already applied to this job" });
         }
 
+        // Run the ATS keyword check automatically at application time, using
+        // whatever CV was submitted. Purely local/deterministic, no external API.
+        const atsAnalysis = cv ? computeATSAnalysis(cv, job) : null;
+        const atsScore = atsAnalysis ? atsAnalysis.score : undefined;
+        const autoRejected = atsAnalysis !== null && atsAnalysis.score < ATS_REJECT_THRESHOLD;
+
         job.applications.push({
             applicant: selfId,
             cv: cv || undefined,
             matchPercentage: typeof matchPercentage === 'number' ? matchPercentage : undefined,
+            atsScore,
+            status: autoRejected ? 'rejected' : 'pending',
             appliedAt: new Date()
         });
 
@@ -191,15 +167,43 @@ exports.applyToJob = async (req, res) => {
 
         await User.findByIdAndUpdate(selfId, { $addToSet: { applied_jobs: job._id } });
 
+        // Notify the poster of the new application either way.
         if (job.postedBy && job.postedBy.toString() !== selfId.toString()) {
-            const content = `${req.user.f_name} applied to your job: ${job.title}`;
-            const notification = new NotificationModel({
-                sender: selfId, receiver: job.postedBy, content, type: "jobApplication", jobId: job._id
+            const posterContent = autoRejected
+                ? `${req.user.f_name} applied to your job: ${job.title} (auto-rejected — ${atsScore}% ATS match)`
+                : `${req.user.f_name} applied to your job: ${job.title}`;
+
+            const posterNotification = new NotificationModel({
+                sender: selfId, 
+                receiver: job.postedBy, 
+                content: posterContent, 
+                type: "jobApplication", 
+                jobId: job._id
             });
-            await notification.save();
+            await posterNotification.save();
         }
 
-        return res.status(200).json({ message: "Applied to job successfully" });
+        // If the résumé didn't clear the ATS bar, notify the applicant right away.
+        if (autoRejected && job.postedBy) {
+            const rejectionContent = `Thanks for applying to ${job.title} at ${job.company}. Unfortunately your résumé didn't match enough of the key requirements for this role (${atsScore}% ATS match), so it won't be moving forward at this time.`;
+            
+            const rejectionNotification = new NotificationModel({
+                sender: job.postedBy, 
+                receiver: selfId, 
+                content: rejectionContent, 
+                type: "jobRejected", 
+                jobId: job._id
+            });
+            await rejectionNotification.save();
+        }
+
+        return res.status(200).json({
+            message: autoRejected
+                ? "Applied — this role requires a closer keyword match, so your application was automatically declined"
+                : "Applied to job successfully",
+            autoRejected,
+            atsScore
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Server error', message: err.message });
@@ -340,7 +344,11 @@ exports.referConnection = async (req, res) => {
 
         const content = `${req.user.f_name} referred you for a job: ${job.title} at ${job.company}`;
         const notification = new NotificationModel({
-            sender: selfId, receiver: connectionId, content, type: "jobReferral", jobId: job._id
+            sender: selfId, 
+            receiver: connectionId, 
+            content, 
+            type: "jobReferral", 
+            jobId: job._id
         });
         await notification.save();
 

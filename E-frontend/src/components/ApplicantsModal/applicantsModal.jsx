@@ -1,3 +1,5 @@
+// E-frontend/src/components/ApplicantsModal/applicantsModal.jsx
+
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
@@ -6,13 +8,16 @@ import PersonIcon from '@mui/icons-material/Person'
 import DescriptionIcon from '@mui/icons-material/Description'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutlined'
+import FactCheckIcon from '@mui/icons-material/FactCheck'
 import MatchBadge from '../MatchBadge/matchBadge'
 import MessageModal from '../MessageModal/messageModal'
+import ATSCheckModal from '../ATSCheckModal/atsCheckModal'
 
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 
 const ApplicantsModal = ({ job, onClose }) => {
+    const [atsTarget, setAtsTarget] = useState(null);
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedApp, setSelectedApp] = useState(null);
@@ -27,6 +32,15 @@ const ApplicantsModal = ({ job, onClose }) => {
         fetchApplicants();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [job?._id]);
+
+    const handleOpenATS = (e, app) => {
+        e.stopPropagation();
+        if (!app?.cv) {
+            toast.error("This applicant has no résumé to check");
+            return;
+        }
+        setAtsTarget(app);
+    };
 
     const fetchApplicants = async () => {
         setLoading(true);
@@ -90,7 +104,7 @@ const ApplicantsModal = ({ job, onClose }) => {
 
                 {/* Body */}
                 <div className="flex-1 overflow-y-auto">
-                    {loading && (
+                    ={loading && (
                         <div className="flex flex-col items-center justify-center py-24 gap-2">
                             <div className="w-6 h-6 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
                             <p className="text-sm text-gray-400">Loading applicants...</p>
@@ -134,6 +148,11 @@ const ApplicantsModal = ({ job, onClose }) => {
                                                 {app.applicant?.f_name || "Unknown"}
                                             </p>
                                             <MatchBadge percentage={app.matchPercentage} size="sm" />
+                                            {app.status === 'rejected' && (
+                                                <span className="text-[11px] font-semibold text-red-700 bg-red-50 rounded-full px-2 py-0.5 whitespace-nowrap">
+                                                    Auto-rejected{typeof app.atsScore === 'number' ? ` · ${app.atsScore}% ATS` : ''}
+                                                </span>
+                                            )}
                                         </div>
                                         {app.applicant?.headline && (
                                             <p className="text-xs text-gray-500 truncate">{app.applicant.headline}</p>
@@ -143,23 +162,35 @@ const ApplicantsModal = ({ job, onClose }) => {
                                         </p>
                                     </div>
 
-                                    <button
-                                        type="button"
-                                        onClick={(e) => handleOpenMessage(e, app.applicant)}
-                                        title="Message"
-                                        className="flex items-center justify-center border border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 text-gray-500 p-2 rounded-md cursor-pointer transition-colors shrink-0"
-                                    >
-                                        <ChatBubbleOutlineIcon sx={{ fontSize: 17 }} />
-                                    </button>
+                                    {/* Action Buttons Block */}
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleOpenMessage(e, app.applicant)}
+                                            title="Message"
+                                            className="flex items-center justify-center border border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 text-gray-500 p-2 rounded-md cursor-pointer transition-colors shrink-0"
+                                        >
+                                            <ChatBubbleOutlineIcon sx={{ fontSize: 17 }} />
+                                        </button>
 
-                                    {app.cv ? (
-                                        <div className="flex items-center gap-1 text-blue-600 text-xs font-medium shrink-0">
-                                            <DescriptionIcon sx={{ fontSize: 15 }} />
-                                            View CV
-                                        </div>
-                                    ) : (
-                                        <span className="text-[11px] text-gray-400 shrink-0">No CV</span>
-                                    )}
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleOpenATS(e, app)}
+                                            title="Check with ATS"
+                                            className="flex items-center justify-center border border-gray-300 hover:bg-purple-50 hover:border-purple-300 hover:text-purple-600 text-gray-500 p-2 rounded-md cursor-pointer transition-colors shrink-0"
+                                        >
+                                            <FactCheckIcon sx={{ fontSize: 17 }} />
+                                        </button>
+
+                                        {app.cv ? (
+                                            <div className="flex items-center gap-1 text-blue-600 text-xs font-medium shrink-0 ml-1.5">
+                                                <DescriptionIcon sx={{ fontSize: 15 }} />
+                                                View CV
+                                            </div>
+                                        ) : (
+                                            <span className="text-[11px] text-gray-400 shrink-0 ml-1.5">No CV</span>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -258,6 +289,16 @@ const ApplicantsModal = ({ job, onClose }) => {
                         <MessageModal selfData={ownData} userData={messageTarget} />
                     </div>
                 </div>
+            )}
+
+            {/* ATS Check Overlay */}
+            {atsTarget && (
+                <ATSCheckModal
+                    cv={atsTarget.cv}
+                    job={job}
+                    candidateName={atsTarget.applicant?.f_name}
+                    onClose={() => setAtsTarget(null)}
+                />
             )}
         </div>
     )
