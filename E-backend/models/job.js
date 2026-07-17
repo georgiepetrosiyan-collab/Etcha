@@ -1,4 +1,4 @@
-//E/E-backend/models/job.js
+// E/E-backend/models/job.js
 
 const mongoose = require('mongoose');
 
@@ -79,6 +79,15 @@ const JobSchema = new mongoose.Schema({
             },
             matchPercentage: {
                 type: Number
+            },
+            // ATS keyword-check score computed automatically at time of application
+            atsScore: {
+                type: Number
+            },
+            status: {
+                type: String,
+                enum: ["pending", "rejected", "accepted"],
+                default: "pending"
             },
             appliedAt: {
                 type: Date,

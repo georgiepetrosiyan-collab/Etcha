@@ -1,5 +1,11 @@
+// E-frontend/src/components/CreateCVModal/createCVModal.jsx
+
 import React, { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
+// If you use standard axios:
+import axios from "axios"; 
+
+// OR if you intended to use a custom configured instance from your project:
+// import axiosInstance from "../../api/axios"; // (or wherever your actual axiosInstance file lives)
 import { toast } from 'react-toastify'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
@@ -61,7 +67,7 @@ const CreateCVModal = ({ job, onClose }) => {
         setError(false);
         setApplied(false);
         try {
-            const cvRes = await axios.post(
+            const cvRes = await axiosInstance.post(
                 'http://localhost:4000/api/cv/generate',
                 { jobId: job._id },
                 { withCredentials: true }
@@ -121,13 +127,17 @@ const CreateCVModal = ({ job, onClose }) => {
     const handleApply = async () => {
         setApplying(true);
         try {
-            await axios.post(
+            const res = await axiosInstance.post(
                 `http://localhost:4000/api/job/${job._id}/apply`,
                 { cv, matchPercentage },
                 { withCredentials: true }
             );
             setApplied(true);
-            toast.success("Applied successfully!");
+            if (res.data?.autoRejected) {
+                toast.error(`Applied, but this résumé only matched ${res.data.atsScore}% of the job's keywords — the application was automatically declined.`);
+            } else {
+                toast.success("Applied successfully!");
+            }
         } catch (err) {
             console.log(err);
             toast.error(err?.response?.data?.error || "Something Went Wrong");

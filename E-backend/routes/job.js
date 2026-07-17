@@ -16,5 +16,5 @@ router.post('/:id/apply', Authentication.auth, JobController.applyToJob);
 router.post('/refer', Authentication.auth, JobController.referConnection);
 router.put('/:id/status', Authentication.auth, JobController.updateJobStatus);
 router.delete('/:id', Authentication.auth, JobController.deleteJob);
-
+router.post('/ats-check', Authentication.auth, JobController.checkATS);
 module.exports = router;

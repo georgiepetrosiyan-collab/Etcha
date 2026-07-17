@@ -9,7 +9,7 @@ const NotificationSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true,
-        enum: ['friendRequest', 'comment', 'jobReferral', 'jobApplication', 'jobInterview', 'referralHired']
+        enum: ['friendRequest', 'comment', 'jobReferral', 'jobApplication', 'jobInterview', 'referralHired', 'jobRejected']
     },
     isRead: { type: Boolean, default: false },
     postId: { type: mongoose.Schema.Types.ObjectId, ref: 'post' },

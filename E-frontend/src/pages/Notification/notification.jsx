@@ -1,4 +1,4 @@
-//E/E-frontend/pages/Notification/notification.jsx 
+// E/E-frontend/src/pages/Notification/notification.jsx 
 
 import React, { useEffect, useState } from 'react';
 import ProfileCard from '../../components/ProfileCard/profileCard';
@@ -32,7 +32,7 @@ const Notification = () => {
             if (item.type === "comment" && item.postId) {
                 navigate(`/profile/${ownData?._id}/activities/${item.postId}`);
             } else if (
-                (item.type === "jobReferral" || item.type === "jobApplication" || item.type === "jobInterview" || item.type === "referralHired") &&
+                (item.type === "jobReferral" || item.type === "jobApplication" || item.type === "jobInterview" || item.type === "referralHired" || item.type === "jobRejected") &&
                 item.jobId
             ) {
                 navigate(`/job/${item.jobId}`);

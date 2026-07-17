@@ -2,6 +2,38 @@
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Fixed mock résumé returned when ETCHA_MOCK=true, so we can test the
+// apply/refer/CV flow without burning through the Gemini API quota.
+function getMockCV(user, job) {
+    return {
+        fullName: user?.f_name || "Test Candidate",
+        targetJobTitle: job?.title || "Software Engineer",
+        location: user?.curr_location || "Yerevan, Armenia",
+        professionalSummary:
+            "This is a MOCK résumé generated because ETCHA_MOCK=true. " +
+            "It is used for testing the application flow without calling the Gemini API.",
+        coreSkills: (user?.skills && user.skills.length) ? user.skills : ["JavaScript", "React", "Node.js"],
+        experience: (user?.experience || []).map(e => ({
+            title: e.designation || "Role",
+            company: e.company_name || "Company",
+            duration: e.duration || "",
+            location: e.location || "",
+            bullets: ["Mock bullet point for testing purposes."]
+        })),
+        projects: (user?.projects || []).map(p => ({
+            title: p.title || "Project",
+            description: p.description || "",
+            link: p.link || ""
+        })),
+        certifications: (user?.certifications || []).map(c => ({
+            name: c.name || "",
+            issuer: c.issuer || "",
+            date: c.date || ""
+        })),
+        keywordsMatched: ["mock", "test"]
+    };
+}
+
 async function callGeminiWithRetry(body, maxRetries = 3) {
     let lastError = null;
 
@@ -43,8 +75,15 @@ async function callGeminiWithRetry(body, maxRetries = 3) {
  * Omits sections the candidate has no real data for (experience, projects, certifications)
  * rather than fabricating placeholder entries.
  * Throws an Error with a `.status` on failure.
+ *
+ * If process.env.ETCHA_MOCK === "true", returns a fixed mock CV instead of calling
+ * the Gemini API — useful for testing the apply/refer flow without burning quota.
  */
 async function generateResumeForUser(user, job) {
+    if (process.env.ETCHA_MOCK === "true") {
+        return getMockCV(user, job);
+    }
+
     if (!process.env.GEMINI_API_KEY) {
         const err = new Error("CV generation is not configured. Missing GEMINI_API_KEY.");
         err.status = 500;

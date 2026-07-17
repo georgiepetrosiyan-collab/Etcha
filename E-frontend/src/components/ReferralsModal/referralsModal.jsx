@@ -9,9 +9,11 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 import CheckIcon from '@mui/icons-material/Check'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
+import FactCheckIcon from '@mui/icons-material/FactCheck'
 import MatchBadge from '../MatchBadge/matchBadge'
 import A4ResumePreview from '../A4ResumePreview/a4ResumePreview'
 import ConfirmModal from '../ConfirmModal/confirmModal'
+import ATSCheckModal from '../ATSCheckModal/atsCheckModal'
 
 const STATUS_STYLES = {
     pending: { label: "Pending review", cls: "bg-gray-100 text-gray-600" },
@@ -25,6 +27,7 @@ const ReferralsModal = ({ job, onClose }) => {
     const [selected, setSelected] = useState(null);
     const [actionLoadingId, setActionLoadingId] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
+    const [atsTarget, setAtsTarget] = useState(null);
 
     const stop = (e) => e.stopPropagation();
 
@@ -32,6 +35,15 @@ const ReferralsModal = ({ job, onClose }) => {
         fetchReferrals();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [job?._id]);
+
+    const handleOpenATS = (e, r) => {
+        e.stopPropagation();
+        if (!r?.cv) {
+            toast.error("This referral has no résumé to check yet");
+            return;
+        }
+        setAtsTarget(r);
+    };
 
     const fetchReferrals = async () => {
         setLoading(true);
@@ -110,7 +122,7 @@ const ReferralsModal = ({ job, onClose }) => {
 
     return (
         <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[2100] px-4 py-6"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-2100 px-4 py-6"
             onClick={onClose}
         >
             <div
@@ -147,7 +159,7 @@ const ReferralsModal = ({ job, onClose }) => {
                                 <PersonIcon sx={{ color: "#9ca3af" }} />
                             </div>
                             <p className="text-sm font-medium text-gray-700">No referrals yet</p>
-                            <p className="text-xs text-gray-400 max-w-[240px]">
+                            <p className="text-xs text-gray-400 max-w-240px">
                                 When someone refers a connection to this job, they'll show up here with an auto-generated CV.
                             </p>
                         </div>
@@ -180,6 +192,17 @@ const ReferralsModal = ({ job, onClose }) => {
                                         </div>
 
                                         <div className="flex items-center gap-1.5 shrink-0">
+                                            {r.cv && (
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => handleOpenATS(e, r)}
+                                                    title="Check with ATS"
+                                                    className="flex items-center justify-center border border-gray-300 hover:bg-purple-50 hover:border-purple-300 hover:text-purple-600 text-gray-500 p-1.5 rounded-md cursor-pointer transition-colors"
+                                                >
+                                                    <FactCheckIcon sx={{ fontSize: 16 }} />
+                                                </button>
+                                            )}
+
                                             {r.cv ? (
                                                 <div className="flex items-center gap-1 text-blue-600 text-xs font-medium cursor-pointer" onClick={() => setSelected(r)}>
                                                     <DescriptionIcon sx={{ fontSize: 15 }} />
@@ -256,6 +279,15 @@ const ReferralsModal = ({ job, onClose }) => {
                     loading={actionLoadingId === deleteTarget._id}
                     onConfirm={handleDelete}
                     onCancel={() => setDeleteTarget(null)}
+                />
+            )}
+
+            {atsTarget && (
+                <ATSCheckModal
+                    cv={atsTarget.cv}
+                    job={job}
+                    candidateName={atsTarget.referredUser?.f_name}
+                    onClose={() => setAtsTarget(null)}
                 />
             )}
         </div>
