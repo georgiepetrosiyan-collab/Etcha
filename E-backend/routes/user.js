@@ -11,6 +11,7 @@ router.post('/google',UserController.loginThroughGmail)
 router.put('/update',Authentication.auth,UserController.updateUser)
 router.get('/user/:id',UserController.getProfileById)
 router.post('/logout',Authentication.auth,UserController.logout)
+router.delete('/delete-account', Authentication.auth, UserController.deleteAccount)
 
 router.get('/self',Authentication.auth,(req,res)=>{
     return res.status(200).json({
@@ -26,6 +27,5 @@ router.delete('/removeFromFriendList/:friendId',Authentication.auth,UserControll
 
 router.get('/friendsList',Authentication.auth,UserController.getFriendsList)
 router.get('/pendingFriendsList',Authentication.auth,UserController.getPendingFriendList)
-
 
 module.exports = router;

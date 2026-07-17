@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import './App.css';
 
 import Navbar1 from "./components/NavBar_1/navbar1";
@@ -19,14 +19,17 @@ import Job from './pages/Job/job';
 
 function App() {
   const [isLogin, setIsLogin] = useState(localStorage.getItem('isLogin') === 'true');
+  const location = useLocation();
 
   const changeLoginValue = (val) => {
     setIsLogin(val);
   };
 
+  const isCVPage = location.pathname.startsWith('/create-cv');
+
   return (
     <div className="relative w-full h-screen">
-      {isLogin ? <Navbar_2 /> : <Navbar1 />}
+      {!isCVPage && (isLogin ? <Navbar_2 /> : <Navbar1 />)}
 
       <Routes>
         <Route

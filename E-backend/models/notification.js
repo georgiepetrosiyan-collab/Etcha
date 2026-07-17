@@ -3,37 +3,18 @@
 const mongoose = require('mongoose');
 
 const NotificationSchema = new mongoose.Schema({
-    sender: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
-        required: true
-    },
-    receiver: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
-        required: true
-    },
-    content: {
-        type: String,
-        required: true
-    },
+    sender: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
+    receiver: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
+    content: { type: String, required: true },
     type: {
         type: String,
         required: true,
-        enum: ['friendRequest', 'comment', 'jobReferral']
+        enum: ['friendRequest', 'comment', 'jobReferral', 'jobApplication', 'jobInterview', 'referralHired']
     },
-    isRead: {
-        type: Boolean,
-        default: false
-    },
-    postId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'post'
-    },
-    jobId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'job'
-    }
+    isRead: { type: Boolean, default: false },
+    postId: { type: mongoose.Schema.Types.ObjectId, ref: 'post' },
+    jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'job' },
+    referralId: { type: mongoose.Schema.Types.ObjectId, ref: 'referral' }
 }, { timestamps: true });
 
 const NotificationModel = mongoose.model('notification', NotificationSchema);
