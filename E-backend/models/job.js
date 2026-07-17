@@ -38,6 +38,11 @@ const JobSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    status: {
+        type: String,
+        enum: ["open", "closed"],
+        default: "open"
+    },
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
@@ -46,6 +51,39 @@ const JobSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'user'
+        }
+    ],
+    applications: [
+        {
+            applicant: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'user',
+                required: true
+            },
+            cv: {
+                fullName: String,
+                targetJobTitle: String,
+                location: String,
+                professionalSummary: String,
+                coreSkills: [String],
+                experience: [
+                    {
+                        title: String,
+                        company: String,
+                        duration: String,
+                        location: String,
+                        bullets: [String]
+                    }
+                ],
+                keywordsMatched: [String]
+            },
+            matchPercentage: {
+                type: Number
+            },
+            appliedAt: {
+                type: Date,
+                default: Date.now
+            }
         }
     ]
 }, { timestamps: true });

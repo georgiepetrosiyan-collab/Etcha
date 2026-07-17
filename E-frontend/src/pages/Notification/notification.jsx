@@ -27,14 +27,14 @@ const Notification = () => {
     const handleOnClickNotification = async (item) => {
         try {
             await axios.put(`${API_BASE_URL}/notification/isRead`, { notificationId: item._id }, { withCredentials: true });
-            
-            setNotifications(prev => 
-                prev.map(notif => notif._id === item._id ? { ...notif, isRead: true } : notif)
-            );
+            setNotifications(prev => prev.map(notif => notif._id === item._id ? { ...notif, isRead: true } : notif));
 
             if (item.type === "comment" && item.postId) {
                 navigate(`/profile/${ownData?._id}/activities/${item.postId}`);
-            } else if (item.type === "jobReferral" && item.jobId) {
+            } else if (
+                (item.type === "jobReferral" || item.type === "jobApplication" || item.type === "jobInterview" || item.type === "referralHired") &&
+                item.jobId
+            ) {
                 navigate(`/job/${item.jobId}`);
             } else {
                 navigate("/myNetwork");
@@ -68,15 +68,15 @@ const Notification = () => {
                             <div className="p-5 text-center text-gray-500">No new notifications</div>
                         ) : (
                             notifications.map((item) => (
-                                <div 
-                                    key={item._id} 
-                                    onClick={() => handleOnClickNotification(item)} 
+                                <div
+                                    key={item._id}
+                                    onClick={() => handleOnClickNotification(item)}
                                     className={`flex border-b cursor-pointer gap-4 items-center border-gray-300 p-4 transition hover:bg-gray-200 ${item?.isRead ? "bg-white" : "bg-blue-50"}`}
                                 >
-                                    <img 
-                                        src={item?.sender?.profilePic || 'https://via.placeholder.com/150'} 
+                                    <img
+                                        src={item?.sender?.profilePic || 'https://via.placeholder.com/150'}
                                         alt="Profile"
-                                        className="rounded-full cursor-pointer w-12 h-12 object-cover shrink-0" 
+                                        className="rounded-full cursor-pointer w-12 h-12 object-cover shrink-0"
                                     />
                                     <div className="text-sm md:text-base text-gray-800">
                                         <span className="font-semibold mr-1">{item?.sender?.f_name}</span>
