@@ -178,7 +178,7 @@ const Profile = () => {
 
     const copyToClipboard = async () => {
         try {
-            let string = `http://localhost:5173/profile/${id}`
+            let string = `${window.location.origin}/profile/${id}`
             await navigator.clipboard.writeText(string);
             toast.success("Copied to clipboard");
         } catch (err) {
