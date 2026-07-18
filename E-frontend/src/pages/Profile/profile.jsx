@@ -270,9 +270,9 @@ const Profile = () => {
                             <div className='flex justify-between items-center'>
                                 <div className='text-xl'>Skills</div>
                             </div>
-                            <div className='text-gray-700 text-md my-2 w-full flex gap-4 flex-wrap'>
+                            <div className='text-gray-700 text-md my-2 w-full flex gap-2 flex-wrap'>
                                 {userData?.skills?.map((item, index) => (
-                                    <div key={index} className='py-2 px-3 cursor-pointer bg-blue-800 text-white rounded-lg'>{item}</div>
+                                    <div key={index} className='py-1 px-2 border cursor-default border-accent text-accent rounded-lg text-sm'>{item}</div>
                                 ))}
                             </div>
                         </Card>
