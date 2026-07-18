@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 // If you use standard axios:
-import axios from "axios"; 
+import axios from "axios";
 
 // OR if you intended to use a custom configured instance from your project:
 // import axiosInstance from "../../api/axios"; // (or wherever your actual axiosInstance file lives)
@@ -67,7 +67,7 @@ const CreateCVModal = ({ job, onClose }) => {
         setError(false);
         setApplied(false);
         try {
-            const cvRes = await axiosInstance.post(
+            const cvRes = await axios.post(
                 'http://localhost:4000/api/cv/generate',
                 { jobId: job._id },
                 { withCredentials: true }
@@ -127,7 +127,7 @@ const CreateCVModal = ({ job, onClose }) => {
     const handleApply = async () => {
         setApplying(true);
         try {
-            const res = await axiosInstance.post(
+            const res = await axios.post(
                 `http://localhost:4000/api/job/${job._id}/apply`,
                 { cv, matchPercentage },
                 { withCredentials: true }
