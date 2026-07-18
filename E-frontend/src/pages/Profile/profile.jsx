@@ -223,8 +223,8 @@ const Profile = () => {
 
                                         <div className='md:flex w-full justify-between'>
                                             <div className="my-5 flex gap-5">
-                                                <div className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold" onClick={copyToClipboard}>Share</div>
-                                                {isOwnProfile && <div onClick={handleLogout} className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">Logout</div>}
+                                                <div className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold" onClick={copyToClipboard}>Copy link</div>
+                                                {isOwnProfile && <div onClick={handleLogout} className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">Sign out</div>}
                                             </div>
 
                                             <div className="my-5 flex gap-5">
