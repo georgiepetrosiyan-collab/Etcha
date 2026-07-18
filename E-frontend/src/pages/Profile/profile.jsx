@@ -1,4 +1,4 @@
-//E/E-frontend/pages/Profile/profile.jsx 
+//E/E-frontend/pages/Profile/profile.jsx
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -223,7 +223,6 @@ const Profile = () => {
 
                                         <div className='md:flex w-full justify-between'>
                                             <div className="my-5 flex gap-5">
-                                                <div className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">Open to</div>
                                                 <div className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold" onClick={copyToClipboard}>Share</div>
                                                 {isOwnProfile && <div onClick={handleLogout} className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">Logout</div>}
                                             </div>
