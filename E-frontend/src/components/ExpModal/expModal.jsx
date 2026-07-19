@@ -1,5 +1,6 @@
 //E/E-frontend/components/ExpModal/expModal.jsx
 import React, { useState } from 'react'
+import Button from '../Button/button'
 
 const ExpModal = ({ handleEditFunc, selfData, updateExp, setUpdateExp }) => {
 
@@ -74,9 +75,9 @@ const ExpModal = ({ handleEditFunc, selfData, updateExp, setUpdateExp }) => {
             </div>
 
             <div className='flex justify-between'>
-                <div className="bg-blue-950 text-white w-fit py-1 px-3 cursor-pointer rounded-2xl" onClick={handleOnSave}>Save</div>
+                <Button onClick={handleOnSave}>Save</Button>
                 {
-                    updateExp?.clicked && <div className="bg-blue-950 text-white w-fit py-1 px-3 cursor-pointer rounded-2xl" onClick={handleOnDelete}>Delete</div>
+                    updateExp?.clicked && <Button onClick={handleOnDelete}>Delete</Button>
                 }
             </div>
         </div>
