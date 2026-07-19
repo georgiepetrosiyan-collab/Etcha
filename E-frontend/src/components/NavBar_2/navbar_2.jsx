@@ -86,49 +86,7 @@ const Navbar_2 = () => {
                     }
                 </div>
 
-                <div className="hidden gap-10 md:flex">
-
-                    <Link to="/feeds" className="flex flex-col items-center cursor-pointer">
-                        <HomeIcon sx={{ color: location.pathname === "/feeds" ? "black" : "gray" }} />
-                        <div className={`text-sm text-gray-500 ${location.pathname === "/feeds" ? "border-b-3" : ""}`}>
-                            Home
-                        </div>
-                    </Link>
-
-                    <Link to="/myNetwork" className="flex flex-col items-center cursor-pointer">
-                        <PeopleAltIcon sx={{ color: location.pathname === "/myNetwork" ? "black" : "gray" }} />
-                        <div className={`text-sm text-gray-500 ${location.pathname === "/myNetwork" ? "border-b-3 " : ""}`}>
-                            My Network
-                        </div>
-                    </Link>
-
-                    <Link to="/job" className="flex flex-col items-center cursor-pointer">
-                        <WorkIcon sx={{ color: location.pathname === "/job" ? "black" : "gray" }} />
-                        <div className={`text-sm text-gray-500 ${location.pathname === "/job" ? "border-b-3 " : ""}`}>
-                            Job
-                        </div>
-                    </Link>
-
-                    <Link to="/messages" className="flex flex-col items-center cursor-pointer">
-                        <ForumIcon sx={{ color: location.pathname === "/messages" ? "black" : "gray" }} />
-                        <div className={`text-sm text-gray-500 ${location.pathname === "/messages" ? "border-b-3 " : ""}`}>
-                            Message
-                        </div>
-                    </Link>
-
-                    <Link to={"/notification"} className="flex flex-col items-center cursor-pointer">
-                        <div><NotificationsIcon sx={{ color: location.pathname === "/notification" ? "black" : "gray" }} /> {notificationCount>0 && <span className="p-1 rounded-full text-sm bg-red-700 text-white">{notificationCount}</span>}</div>
-                        <div className={`text-sm text-gray-500 ${location.pathname === "/notification" ? "border-b-3 " : ""}`}>
-                            Notification
-                        </div>
-                    </Link>
-
-                    <Link to={`/profile/${userData?._id}`} className="flex flex-col items-center cursor-pointer">
-                        <img className="w-8 h-8 rounded-full" src={userData?.profilePic} alt="profile" />
-                        <div className="text-sm text-gray-500">Me</div>
-                    </Link>
-
-                </div>
+               
 
             </div>
         </div>

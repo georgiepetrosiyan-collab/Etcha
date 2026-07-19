@@ -125,20 +125,16 @@ const JobAnnounce = ({ job, ownId, onStatusChanged, onDeleted }) => {
                                     </button>
                                 </div>
                             ) : (
-                                <>
+<>
                                     <button type="button" onClick={() => setIsReferOpen(true)}
                                         className="flex items-center gap-1 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium px-3 py-2 rounded-md cursor-pointer transition-colors">
                                         <PersonAddIcon sx={{ fontSize: 16 }} />
                                         Refer
                                     </button>
-                                    <button type="button" onClick={() => setIsCVOpen(true)}
-                                        className="flex items-center gap-1 border border-blue-600 text-blue-600 hover:bg-blue-50 text-sm font-medium px-3 py-2 rounded-md cursor-pointer transition-colors">
+                                    <button type="button" onClick={() => setIsCVOpen(true)} disabled={isClosed}
+                                        className={`flex items-center gap-1 text-sm font-medium px-4 py-2 rounded-md transition-colors ${isClosed ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"}`}>
                                         <DescriptionIcon sx={{ fontSize: 16 }} />
-                                        Create CV
-                                    </button>
-                                    <button type="button" onClick={onApply} disabled={isClosed}
-                                        className={`text-sm font-medium px-4 py-2 rounded-md transition-colors ${isClosed ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"}`}>
-                                        {isClosed ? "Closed" : "Apply"}
+                                        {isClosed ? "Closed" : "Apply with AI Résumé"}
                                     </button>
                                 </>
                             )}

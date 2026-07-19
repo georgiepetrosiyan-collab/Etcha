@@ -7,17 +7,26 @@ import Card from '../../components/Card/card';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+// FIX 1: Added missing import for Navbar_3
+import Navbar_3 from '../../components/NavBar_3/navbar_3';
+
 const API_BASE_URL = 'http://localhost:4000/api';
 
 const Notification = () => {
     const navigate = useNavigate();
     const [ownData, setOwnData] = useState(null);
     const [notifications, setNotifications] = useState([]);
+    const [notificationCount, setNotificationCount] = useState(0); // FIX 2: Added missing state
 
     const fetchNotificationData = async () => {
         try {
             const res = await axios.get(`${API_BASE_URL}/notification`, { withCredentials: true });
-            setNotifications(res.data.notifications || []);
+            const fetchedNotifications = res.data.notifications || [];
+            setNotifications(fetchedNotifications);
+            
+            // FIX 2: Calculate initial unread notifications count for the badge
+            const unreadCount = fetchedNotifications.filter(n => !n.isRead).length;
+            setNotificationCount(unreadCount);
         } catch (err) {
             console.error("Error fetching notifications:", err);
             alert("Something went wrong while fetching notifications");
@@ -27,7 +36,14 @@ const Notification = () => {
     const handleOnClickNotification = async (item) => {
         try {
             await axios.put(`${API_BASE_URL}/notification/isRead`, { notificationId: item._id }, { withCredentials: true });
+            
+            // Update the notifications array locally
             setNotifications(prev => prev.map(notif => notif._id === item._id ? { ...notif, isRead: true } : notif));
+            
+            // FIX 2: Decrement the badge count when marking an item as read
+            if (!item.isRead) {
+                setNotificationCount(prev => Math.max(0, prev - 1));
+            }
 
             if (item.type === "comment" && item.postId) {
                 navigate(`/profile/${ownData?._id}/activities/${item.postId}`);
@@ -53,11 +69,13 @@ const Notification = () => {
 
     return (
         <div className="px-5 xl:px-50 py-9 flex gap-5 w-full mt-5 bg-gray-100 min-h-screen">
-            {/* left side */}
+            {/* Left Side Bar */}
             <div className="w-[21%] sm:block sm:w-[23%] hidden py-5">
-                <div className="h-fit">
+                <div className="h-left">
+                    {/* FIX 3: Fixed the typo here from ownDataData to ownData */}
                     <ProfileCard data={ownData} />
                 </div>
+                <Navbar_3 userData={ownData} notificationCount={notificationCount} />
             </div>
 
             {/* middle side */}

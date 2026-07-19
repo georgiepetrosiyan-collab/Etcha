@@ -31,7 +31,7 @@ const JobDescriptionModal = ({ job, ownId, onClose, onStatusChanged, onDeleted }
     const {
         _id, title = "Job Title", company = "Company Name", companyLogo = "",
         location = "Location", type = "Full-time", salary = "", description = "",
-        fullDescription = "", postedAt = "", matchPercentage, postedBy, onApply = () => {},
+        fullDescription = "", postedAt = "", matchPercentage, postedBy, onApply = () => { },
     } = job;
 
     const isOwner = ownId && postedBy && (postedBy?._id || postedBy)?.toString() === ownId.toString();
@@ -128,17 +128,11 @@ const JobDescriptionModal = ({ job, ownId, onClose, onStatusChanged, onDeleted }
                             </button>
                         </div>
                     ) : (
-                        <>
-                            <button type="button" onClick={() => setIsCVOpen(true)}
-                                className="flex items-center gap-1 border border-blue-600 text-blue-600 hover:bg-blue-50 text-sm font-medium px-4 py-2 rounded-md cursor-pointer transition-colors">
-                                <DescriptionIcon sx={{ fontSize: 16 }} />
-                                Create CV
-                            </button>
-                            <button type="button" onClick={onApply} disabled={isClosed}
-                                className={`ml-auto text-sm font-medium px-4 py-2 rounded-md transition-colors ${isClosed ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"}`}>
-                                {isClosed ? "Closed" : "Apply"}
-                            </button>
-                        </>
+                        <button type="button" onClick={() => setIsCVOpen(true)} disabled={isClosed}
+                            className={`ml-auto flex items-center gap-1 text-sm font-medium px-4 py-2 rounded-md transition-colors ${isClosed ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"}`}>
+                            <DescriptionIcon sx={{ fontSize: 16 }} />
+                            {isClosed ? "Closed" : "Apply with AI Résumé"}
+                        </button>
                     )}
                 </div>
             </div>

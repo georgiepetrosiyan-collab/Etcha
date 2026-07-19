@@ -9,6 +9,7 @@ import Advertisement from '../../components/Advertisement/advertisement';
 import Card from '../../components/Card/card';
 import Post from '../../components/Post/post';
 import Modal from '../../components/Modal/modal';
+import EducationModal from '../../components/EducationModal/educationModal';
 import ImageModal from '../../components/ImageModal/imageModal';
 import EditinfoModal from '../../components/EditInfoModal/editInfoModal';
 import AboutModal from '../../components/AboutModal/aboutModal';
@@ -42,7 +43,18 @@ const Profile = () => {
     const [ownData, setOwnData] = useState(null);
 
     const [updateExp, setUpdateExp] = useState({ clicked: "", id: "", datas: {} });
+    const [eduModal, setEduModal] = useState(false);
+    const [updateEdu, setUpdateEdu] = useState({ clicked: "", id: "", datas: {} });
 
+    const updateEduEdit = (id, data) => {
+        setUpdateEdu({ ...updateEdu, clicked: true, id: id, data: data });
+        setEduModal(prev => !prev);
+    }
+
+    const handleEduModal = () => {
+        if (eduModal) setUpdateEdu({ clicked: "", id: "", datas: {} });
+        setEduModal(prev => !prev);
+    }
     const updateExpEdit = (id, data) => {
         setUpdateExp({ ...updateExp, clicked: true, id: id, data: data });
         setExpModal(prev => !prev);
@@ -265,6 +277,24 @@ const Profile = () => {
                             </Card>
                         </div>
                     )}
+                    {userData?.experience?.map((item, index) => (
+                        <div key={index} className='p-2 border-t border-gray-300 flex justify-between'>
+                            <div>
+                                <div className="text-lg">{item.designation || "Job Title"}</div>
+                                <div className="text-sm">{item.company_name || "Company"}</div>
+                                <div className="text-sm text-gray-500">{item.startDate || "Start Date"} - {item.endDate || "Present"}</div>
+                                <div className="text-sm text-gray-500">{item.location || "Location"}</div>
+                                {item.description && <div className="text-sm text-gray-600 mt-1 whitespace-pre-line">{item.description}</div>}
+                            </div>
+                            <div>
+                                {isOwnProfile && (
+                                    <div onClick={() => { updateExpEdit(item._id, item) }} className='cursor-pointer'>
+                                        <EditIcon />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
 
                     <div className='mt-5'>
                         <Card padding={1}>
@@ -333,6 +363,36 @@ const Profile = () => {
                                 ))}
                                 {(!userData?.experience || userData.experience.length === 0) && (
                                     <div className='text-sm text-gray-400 py-2'>No experience added yet.</div>
+                                )}
+                            </div>
+                        </Card>
+                    </div>
+
+                    <div className='mt-5'>
+                        <Card padding={1}>
+                            <div className="flex justify-between items-center">
+                                <div className="text-xl">Education</div>
+                                {isOwnProfile && <div onClick={handleEduModal} className="cursor-pointer"><AddIcon /></div>}
+                            </div>
+                            <div className='mt-5'>
+                                {userData?.education?.map((item, index) => (
+                                    <div key={index} className='p-2 border-t border-gray-300 flex justify-between'>
+                                        <div>
+                                            <div className="text-lg">{item.school || "School"}</div>
+                                            <div className="text-sm">{item.degree}{item.fieldOfStudy ? `, ${item.fieldOfStudy}` : ""}</div>
+                                            <div className="text-sm text-gray-500">{item.duration}</div>
+                                        </div>
+                                        <div>
+                                            {isOwnProfile && (
+                                                <div onClick={() => { updateEduEdit(item._id, item) }} className='cursor-pointer'>
+                                                    <EditIcon />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                                {(!userData?.education || userData.education.length === 0) && (
+                                    <div className='text-sm text-gray-400 py-2'>No education added yet.</div>
                                 )}
                             </div>
                         </Card>
@@ -421,6 +481,11 @@ const Profile = () => {
             {projectsCertsModal && (
                 <Modal title="Projects & Certifications" closeModal={handleProjectsCertsModal}>
                     <ProjectsCertsModal handleEditFunc={handleEditFunc} selfData={ownData} />
+                </Modal>
+            )}
+            {eduModal && (
+                <Modal title="Education" closeModal={handleEduModal}>
+                    <EducationModal handleEditFunc={handleEditFunc} selfData={ownData} updateEdu={updateEdu} setUpdateEdu={updateEduEdit} />
                 </Modal>
             )}
 

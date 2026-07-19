@@ -20,14 +20,20 @@ exports.getReferralsForJob = async (req, res) => {
             return res.status(403).json({ error: "Only the job poster can view referrals" });
         }
 
-        const referrals = await Referral.find({ job: id })
+const referrals = await Referral.find({ job: id })
             .populate('referredUser', 'f_name headline profilePic curr_company curr_location')
             .populate('referrer', 'f_name profilePic')
             .sort({ createdAt: -1 });
 
+        const referralsForResponse = referrals.map(r => {
+            const obj = r.toObject();
+            delete obj.matchPercentage;
+            return obj;
+        });
+
         return res.status(200).json({
             message: "Referrals fetched successfully",
-            referrals
+            referrals: referralsForResponse
         });
     } catch (err) {
         console.error(err);

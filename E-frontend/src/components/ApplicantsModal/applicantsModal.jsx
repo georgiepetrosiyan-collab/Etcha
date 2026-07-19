@@ -297,7 +297,13 @@ const ApplicantsModal = ({ job, onClose }) => {
                     cv={atsTarget.cv}
                     job={job}
                     candidateName={atsTarget.applicant?.f_name}
+                    applicantId={atsTarget.applicant?._id}
                     onClose={() => setAtsTarget(null)}
+                    onRejected={() => {
+                        setApplications(prev => prev.map(a =>
+                            a._id === atsTarget._id ? { ...a, status: 'rejected' } : a
+                        ));
+                    }}
                 />
             )}
         </div>

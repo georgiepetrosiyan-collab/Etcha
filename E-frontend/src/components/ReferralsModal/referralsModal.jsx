@@ -287,6 +287,8 @@ const ReferralsModal = ({ job, onClose }) => {
                     cv={atsTarget.cv}
                     job={job}
                     candidateName={atsTarget.referredUser?.f_name}
+                    applicantId={atsTarget.referredUser?._id}
+                    referralId={atsTarget._id}
                     onClose={() => setAtsTarget(null)}
                 />
             )}

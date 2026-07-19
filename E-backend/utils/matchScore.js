@@ -1,143 +1,187 @@
 //E/E-backend/utils/matchScore.js
 
-const STOPWORDS = new Set([
-    'the', 'a', 'an', 'and', 'or', 'but', 'if', 'then', 'else', 'for', 'to', 'of', 'in', 'on',
-    'at', 'by', 'with', 'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'this',
-    'that', 'these', 'those', 'it', 'its', 'their', 'they', 'he', 'she', 'we', 'you', 'your',
-    'our', 'i', 'me', 'my', 'will', 'shall', 'can', 'could', 'should', 'would', 'may', 'might',
-    'must', 'not', 'no', 'do', 'does', 'did', 'has', 'have', 'had', 'job', 'role', 'position',
-    'company', 'team', 'work', 'experience', 'years', 'year', 'skills', 'required',
-    'requirements', 'responsibilities', 'including', 'etc', 'strong', 'ability', 'looking',
-    'candidate', 'about', 'with'
-]);
+// Curated dictionary of real skills/technologies/degrees/methodologies.
+// The ATS only ever matches against terms in this list — never raw English
+// words from free-text prose — so generic words (like "requirements") can
+// never show up as a "keyword".
+const SKILL_DICTIONARY = [
+    // Languages
+    'javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'php', 'ruby', 'go', 'golang',
+    'rust', 'swift', 'kotlin', 'scala', 'r', 'matlab', 'sql', 'html', 'css', 'sass', 'less',
+    'dart', 'perl', 'objective-c', 'bash', 'shell scripting',
+    // Frontend
+    'react', 'react.js', 'vue', 'vue.js', 'angular', 'next.js', 'nuxt.js', 'svelte',
+    'redux', 'tailwind', 'tailwindcss', 'bootstrap', 'material-ui', 'jquery', 'webpack',
+    'vite', 'graphql', 'rest api', 'restful', 'websocket',
+    // Backend
+    'node.js', 'express', 'express.js', 'django', 'flask', 'fastapi', 'spring', 'spring boot',
+    'laravel', 'ruby on rails', '.net', 'asp.net', 'nestjs',
+    // Databases
+    'mongodb', 'mysql', 'postgresql', 'postgres', 'sqlite', 'redis', 'elasticsearch',
+    'dynamodb', 'firebase', 'firestore', 'oracle', 'cassandra', 'mariadb',
+    // Cloud / DevOps
+    'aws', 'azure', 'gcp', 'google cloud', 'docker', 'kubernetes', 'terraform', 'ansible',
+    'jenkins', 'ci/cd', 'devops', 'nginx', 'linux', 'unix', 'git', 'github', 'gitlab',
+    'bitbucket', 'serverless', 'lambda', 'cloudformation',
+    // Data / AI
+    'machine learning', 'deep learning', 'data science', 'data analysis', 'data engineering',
+    'tensorflow', 'pytorch', 'pandas', 'numpy', 'scikit-learn', 'nlp', 'computer vision',
+    'tableau', 'power bi', 'excel', 'etl', 'big data', 'spark', 'hadoop', 'data modeling',
+    // Mobile
+    'ios', 'android', 'react native', 'flutter', 'xamarin',
+    // Testing / QA
+    'unit testing', 'jest', 'mocha', 'cypress', 'selenium', 'qa', 'test automation',
+    'manual testing', 'tdd', 'bdd',
+    // Methodologies / PM
+    'agile', 'scrum', 'kanban', 'waterfall', 'project management', 'product management',
+    'jira', 'confluence', 'stakeholder management', 'roadmapping',
+    // Design
+    'figma', 'sketch', 'adobe xd', 'ui/ux', 'ui design', 'ux design', 'photoshop', 'illustrator',
+    // Soft skills
+    'communication', 'leadership', 'teamwork', 'problem solving', 'critical thinking',
+    'time management', 'collaboration', 'mentoring', 'public speaking', 'negotiation',
+    // Marketing / Business
+    'seo', 'sem', 'google analytics', 'content marketing', 'social media marketing',
+    'email marketing', 'crm', 'salesforce', 'hubspot', 'copywriting', 'branding',
+    // Degrees / education
+    "bachelor's degree", "master's degree", 'phd', 'doctorate', "associate degree",
+    'computer science', 'software engineering', 'information technology', 'data science degree',
+    'business administration', 'mba', 'electrical engineering', 'mechanical engineering',
+    'mathematics', 'statistics', 'finance', 'economics', 'marketing degree',
+    // Security
+    'cybersecurity', 'penetration testing', 'network security', 'encryption', 'oauth',
+    'authentication', 'authorization',
+];
 
-function tokenize(text) {
-    if (!text) return [];
-    return (text.toLowerCase().match(/[a-z0-9+#./]{3,}/g) || [])
-        .filter(tok => !STOPWORDS.has(tok));
+function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function buildCandidateKeywordSet(user) {
-    const parts = [];
-    if (user.headline) parts.push(user.headline);
-    if (user.about) parts.push(user.about);
-    if (user.skills && user.skills.length) parts.push(user.skills.join(' '));
-    if (user.experience && user.experience.length) {
-        user.experience.forEach(e => {
-            if (e.designation) parts.push(e.designation);
-            if (e.company_name) parts.push(e.company_name);
-        });
+// Alphanumeric-only terms get a real word-boundary match (avoids "sql" matching
+// inside "sqlserverless" etc). Terms with special characters (c++, c#, ci/cd,
+// node.js, .net) fall back to a plain substring match on normalized text, since
+// \b doesn't work reliably around symbols.
+function termAppearsIn(term, normalizedText) {
+    const isPlainAlnum = /^[a-z0-9 ]+$/i.test(term);
+    if (isPlainAlnum) {
+        const pattern = new RegExp(`\\b${escapeRegex(term.toLowerCase())}\\b`, 'i');
+        return pattern.test(normalizedText);
     }
-    return new Set(tokenize(parts.join(' ')));
+    return normalizedText.includes(term.toLowerCase());
 }
 
-function buildJobKeywordSet(job) {
-    const parts = [job.title, job.description, job.fullDescription].filter(Boolean);
-    return new Set(tokenize(parts.join(' ')));
+function extractDictionaryTerms(text) {
+    if (!text) return new Set();
+    const normalized = text.toLowerCase();
+    const found = new Set();
+    SKILL_DICTIONARY.forEach(term => {
+        if (termAppearsIn(term, normalized)) {
+            found.add(term);
+        }
+    });
+    return found;
+}
+
+function buildJobDictionaryTerms(job) {
+    const text = [job.title, job.description, job.fullDescription].filter(Boolean).join(' ');
+    return extractDictionaryTerms(text);
 }
 
 /**
- * Builds a keyword set from an actual generated/submitted résumé (CV object shape:
- * fullName, coreSkills, professionalSummary, experience[].bullets, projects, certifications).
- * This is distinct from buildCandidateKeywordSet, which reads from a raw user profile.
+ * Candidate's real, structured profile data — skills the user explicitly listed,
+ * plus dictionary terms found in education (degree/field) and experience
+ * (designation/company/description). Never touches free-text "about" prose.
  */
-function buildCVKeywordSet(cv) {
-    const parts = [];
-    if (cv.professionalSummary) parts.push(cv.professionalSummary);
-    if (cv.coreSkills && cv.coreSkills.length) parts.push(cv.coreSkills.join(' '));
-    if (cv.experience && cv.experience.length) {
-        cv.experience.forEach(e => {
-            if (e.title) parts.push(e.title);
-            if (e.company) parts.push(e.company);
-            if (e.bullets && e.bullets.length) parts.push(e.bullets.join(' '));
-        });
-    }
-    if (cv.projects && cv.projects.length) {
-        cv.projects.forEach(p => {
-            if (p.title) parts.push(p.title);
-            if (p.description) parts.push(p.description);
-        });
-    }
-    if (cv.certifications && cv.certifications.length) {
-        cv.certifications.forEach(c => {
-            if (c.name) parts.push(c.name);
-            if (c.issuer) parts.push(c.issuer);
-        });
-    }
-    return new Set(tokenize(parts.join(' ')));
-}
+function buildCandidateDictionaryTerms(user) {
+    const terms = new Set();
 
-/**
- * Computes a deterministic 0-100 match score between a candidate profile and a job,
- * based on the candidate's stated skills appearing in the job text plus general
- * keyword overlap. Runs entirely locally, no external API calls, safe to run per-item
- * across a full job list or friend list.
- */
-function computeMatchScore(user, job) {
-    const candidateSkills = (user.skills || []).map(s => (s || '').trim()).filter(Boolean);
-    const jobTextBlob = [job.title, job.description, job.fullDescription]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-
-    const matchedSkills = candidateSkills.filter(skill =>
-        jobTextBlob.includes(skill.toLowerCase())
-    );
-
-    const skillCoverage = candidateSkills.length > 0
-        ? matchedSkills.length / candidateSkills.length
-        : 0;
-
-    const candidateKeywords = buildCandidateKeywordSet(user);
-    const jobKeywords = buildJobKeywordSet(job);
-
-    let overlapCount = 0;
-    jobKeywords.forEach(word => {
-        if (candidateKeywords.has(word)) overlapCount++;
+    (user.skills || []).forEach(s => {
+        if (s) terms.add(s.trim().toLowerCase());
     });
 
-    const keywordOverlap = jobKeywords.size > 0
-        ? overlapCount / jobKeywords.size
-        : 0;
+    const structuredText = [];
+    (user.education || []).forEach(e => {
+        if (e.degree) structuredText.push(e.degree);
+        if (e.fieldOfStudy) structuredText.push(e.fieldOfStudy);
+    });
+    (user.experience || []).forEach(e => {
+        if (e.designation) structuredText.push(e.designation);
+        if (e.description) structuredText.push(e.description);
+    });
 
-    let percentage = Math.round((skillCoverage * 0.6 + keywordOverlap * 0.4) * 100);
-
-    if (matchedSkills.length > 0) {
-        percentage = Math.min(100, percentage + 5);
-    }
-
-    percentage = Math.max(0, Math.min(100, percentage));
-
-    return { matchPercentage: percentage, matchedSkills };
+    extractDictionaryTerms(structuredText.join(' ')).forEach(t => terms.add(t));
+    return terms;
 }
 
 /**
- * Compares a specific submitted résumé (CV object, as generated by generateResumeForUser)
- * against a job's description and returns an ATS-style keyword analysis: which of the
- * job's key terms are present in the résumé text, which are missing, and an overall
- * keyword-coverage score. Intended for job posters reviewing a candidate's or referral's
- * résumé — distinct from computeMatchScore, which works off the raw profile, not the CV.
+ * Same idea but reading from a generated/submitted résumé (CV object) instead
+ * of the raw user profile — used by the ATS check.
+ */
+function buildCVDictionaryTerms(cv) {
+    const terms = new Set();
+
+    (cv.coreSkills || []).forEach(s => {
+        if (s) terms.add(s.trim().toLowerCase());
+    });
+
+    const structuredText = [];
+    (cv.education || []).forEach(e => {
+        if (e.degree) structuredText.push(e.degree);
+        if (e.fieldOfStudy) structuredText.push(e.fieldOfStudy);
+    });
+    (cv.experience || []).forEach(e => {
+        if (e.title) structuredText.push(e.title);
+        if (e.bullets && e.bullets.length) structuredText.push(e.bullets.join(' '));
+    });
+
+    extractDictionaryTerms(structuredText.join(' ')).forEach(t => terms.add(t));
+    return terms;
+}
+
+/**
+ * Deterministic 0-100 match score between a candidate profile and a job,
+ * based purely on dictionary-recognized skills/education/experience overlap.
+ * Local/offline, safe to run across a full job list or friend list.
+ */
+function computeMatchScore(user, job) {
+    const jobTerms = buildJobDictionaryTerms(job);
+    const candidateTerms = buildCandidateDictionaryTerms(user);
+
+    if (jobTerms.size === 0) {
+        return { matchPercentage: 0, matchedSkills: [] };
+    }
+
+    const matched = [...jobTerms].filter(t => candidateTerms.has(t));
+    const percentage = Math.round((matched.length / jobTerms.size) * 100);
+
+    return { matchPercentage: percentage, matchedSkills: matched };
+}
+
+/**
+ * Compares a submitted résumé (CV object) against a job description using
+ * only dictionary-recognized skill/education/experience terms — this is the
+ * "real" ATS check surfaced to job posters.
  */
 function computeATSAnalysis(cv, job) {
     if (!cv) {
         return { score: 0, matchedKeywords: [], missingKeywords: [], totalKeywords: 0 };
     }
 
-    const jobKeywords = buildJobKeywordSet(job);
-    const cvKeywords = buildCVKeywordSet(cv);
+    const jobTerms = buildJobDictionaryTerms(job);
+    const cvTerms = buildCVDictionaryTerms(cv);
 
     const matchedKeywords = [];
     const missingKeywords = [];
 
-    jobKeywords.forEach(word => {
-        if (cvKeywords.has(word)) {
-            matchedKeywords.push(word);
+    jobTerms.forEach(term => {
+        if (cvTerms.has(term)) {
+            matchedKeywords.push(term);
         } else {
-            missingKeywords.push(word);
+            missingKeywords.push(term);
         }
     });
 
-    const totalKeywords = jobKeywords.size;
+    const totalKeywords = jobTerms.size;
     const score = totalKeywords > 0
         ? Math.round((matchedKeywords.length / totalKeywords) * 100)
         : 0;
@@ -145,12 +189,7 @@ function computeATSAnalysis(cv, job) {
     matchedKeywords.sort();
     missingKeywords.sort();
 
-    return {
-        score,
-        matchedKeywords,
-        missingKeywords: missingKeywords.slice(0, 25),
-        totalKeywords
-    };
+    return { score, matchedKeywords, missingKeywords, totalKeywords };
 }
 
 module.exports = { computeMatchScore, computeATSAnalysis };

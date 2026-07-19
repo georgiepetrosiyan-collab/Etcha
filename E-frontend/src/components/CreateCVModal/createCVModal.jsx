@@ -1,11 +1,7 @@
 // E-frontend/src/components/CreateCVModal/createCVModal.jsx
 
 import React, { useEffect, useRef, useState } from 'react'
-// If you use standard axios:
-import axios from "axios"; 
-
-// OR if you intended to use a custom configured instance from your project:
-// import axiosInstance from "../../api/axios"; // (or wherever your actual axiosInstance file lives)
+import axios from "axios";
 import { toast } from 'react-toastify'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
@@ -16,6 +12,11 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import CheckIcon from '@mui/icons-material/Check'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import A4ResumePreview from '../A4ResumePreview/a4ResumePreview'
+
+// Shared global configuration for network requests
+const axiosInstance = axios.create({
+    withCredentials: true
+});
 
 const MATCH_THRESHOLD = 50;
 const A4_WIDTH_PX = 794;
@@ -134,7 +135,7 @@ const CreateCVModal = ({ job, onClose }) => {
             );
             setApplied(true);
             if (res.data?.autoRejected) {
-                toast.error(`Applied, but this résumé only matched ${res.data.atsScore}% of the job's keywords — the application was automatically declined.`);
+                toast.error(`Applied successfully!`);
             } else {
                 toast.success("Applied successfully!");
             }
@@ -215,9 +216,8 @@ const CreateCVModal = ({ job, onClose }) => {
                         <button
                             onClick={handleApply}
                             disabled={applying || applied}
-                            className={`flex items-center gap-1 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors ${
-                                applied ? "bg-green-600 cursor-default" : "bg-blue-600 hover:bg-blue-700 cursor-pointer disabled:opacity-60"
-                            }`}
+                            className={`flex items-center gap-1 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors ${applied ? "bg-green-600 cursor-default" : "bg-blue-600 hover:bg-blue-700 cursor-pointer disabled:opacity-60"
+                                }`}
                         >
                             {applied ? (
                                 <>
