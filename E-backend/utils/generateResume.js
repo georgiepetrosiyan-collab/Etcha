@@ -1,6 +1,14 @@
 //E/E-backend/utils/generateResume.js
 
+const { computeMatchScore } = require('./matchScore');
+
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Below this match %, we stop trying to tailor the resume to the job and
+// instead generate a clean, general, well-structured resume of the candidate's
+// FULL real background (all skills, all experience) — suitable for applying
+// to a range of roles, not force-fit to this one specific job.
+const GENERAL_CV_MATCH_THRESHOLD = 15;
 
 // Fixed mock résumé returned when ETCHA_MOCK=true, so we can test the
 // apply/refer/CV flow without burning through the Gemini API quota.
@@ -13,12 +21,20 @@ function getMockCV(user, job) {
             "This is a MOCK résumé generated because ETCHA_MOCK=true. " +
             "It is used for testing the application flow without calling the Gemini API.",
         coreSkills: (user?.skills && user.skills.length) ? user.skills : ["JavaScript", "React", "Node.js"],
+        education: (user?.education || []).map(e => ({
+            school: e.school || "School",
+            degree: e.degree || "Degree",
+            fieldOfStudy: e.fieldOfStudy || "",
+            duration: e.duration || ""
+        })),
         experience: (user?.experience || []).map(e => ({
             title: e.designation || "Role",
             company: e.company_name || "Company",
-            duration: e.duration || "",
+            duration: `${e.startDate || ''}${e.startDate ? ' - ' : ''}${e.endDate || 'Present'}`,
             location: e.location || "",
-            bullets: ["Mock bullet point for testing purposes."]
+            bullets: e.description
+                ? [e.description]
+                : ["Mock bullet point for testing purposes."]
         })),
         projects: (user?.projects || []).map(p => ({
             title: p.title || "Project",
@@ -72,12 +88,13 @@ async function callGeminiWithRetry(body, maxRetries = 3) {
 
 /**
  * Generates an ATS-optimized, strictly truthful resume for `user` tailored to `job`.
- * Omits sections the candidate has no real data for (experience, projects, certifications)
- * rather than fabricating placeholder entries.
+ * If the candidate's overall match to the job is very low, instead generates a
+ * general, well-structured resume covering ALL of the candidate's real skills
+ * and experience (not narrowed to this job) — suitable to reuse across roles.
  * Throws an Error with a `.status` on failure.
  *
  * If process.env.ETCHA_MOCK === "true", returns a fixed mock CV instead of calling
- * the Gemini API — useful for testing the apply/refer flow without burning quota.
+ * the Gemini API.
  */
 async function generateResumeForUser(user, job) {
     if (process.env.ETCHA_MOCK === "true") {
@@ -90,15 +107,29 @@ async function generateResumeForUser(user, job) {
         throw err;
     }
 
+    const { matchPercentage } = computeMatchScore(user, job);
+    const isLowMatch = matchPercentage < GENERAL_CV_MATCH_THRESHOLD;
+
     const skillsList = (user.skills && user.skills.length)
         ? user.skills.join(', ')
         : 'Not specified';
 
+    const hasEducation = user.education && user.education.length > 0;
+    const educationList = hasEducation
+        ? user.education.map(e =>
+            `- School: ${e.school || 'Not specified'} | Degree: ${e.degree || 'Not specified'} | Field: ${e.fieldOfStudy || 'Not specified'} | Duration: ${e.duration || 'Not specified'}`
+          ).join('\n')
+        : 'NONE — this candidate has no education entries on their profile.';
+
     const hasExperience = user.experience && user.experience.length > 0;
     const experienceList = hasExperience
-        ? user.experience.map(e =>
-            `- Role: ${e.designation || 'Not specified'} | Company: ${e.company_name || 'Not specified'} | Duration: ${e.duration || 'Not specified'} | Location: ${e.location || 'Not specified'}`
-          ).join('\n')
+        ? user.experience.map(e => {
+            const range = `${e.startDate || 'Not specified'} - ${e.endDate || 'Present'}`;
+            const descLine = e.description
+                ? `Candidate's own description of this role: "${e.description}"`
+                : `No description provided by the candidate — infer 3-5 plausible, role-typical achievement bullets based on the job title and company, staying conservative and generic (do not invent specific numbers, clients, or technologies not otherwise evidenced elsewhere in this profile).`;
+            return `- Role: ${e.designation || 'Not specified'} | Company: ${e.company_name || 'Not specified'} | Duration: ${range} | Location: ${e.location || 'Not specified'}\n  ${descLine}`;
+          }).join('\n')
         : 'NONE — this candidate has no work experience entries on their profile.';
 
     const hasProjects = user.projects && user.projects.length > 0;
@@ -117,26 +148,28 @@ async function generateResumeForUser(user, job) {
 
     const systemPrompt = `You are an expert resume writer and ATS (Applicant Tracking System) optimization specialist with 15 years of experience helping candidates pass automated resume screening for top companies (Workday, Greenhouse, Taleo, iCIMS, Lever style parsers).
 
-CORE ATS OPTIMIZATION PRINCIPLES you must follow:
-1. Extract the key hard skills, tools, certifications, and role-specific terminology directly from the job description (the "target keywords") — but ONLY to decide how to phrase and emphasize the candidate's REAL, existing skills and experience. Never use the job description as a source of new skills, projects, or certifications to add to the candidate.
-2. Integrate target keywords NATURALLY throughout the summary and experience bullets — only where the candidate's actual documented background genuinely supports that keyword. NEVER stuff unrelated keywords in just to pad the count, never repeat a keyword more than 2-3 times total.
+CORE PRINCIPLES you must follow:
+1. Extract key hard skills, tools, and role-specific terminology from the job description ONLY to decide how to phrase and emphasize the candidate's REAL, existing skills and experience. Never use the job description as a source of new skills, projects, or certifications to add to the candidate.
+2. For each experience entry: if the candidate provided their own description of what they did, paraphrase THAT truthfully into 2-4 achievement-style bullets (don't just copy it verbatim, but don't invent facts beyond what they described). If no description was provided, infer 3-5 plausible, generic, role-typical bullets based on the job title and company alone — stay conservative, no fabricated specific numbers/clients/technologies.
 3. Use standard, single-column, plain-text-parseable structure. No tables, no icons, no columns.
 4. Use strong, varied action verbs at the start of every bullet — never repeat the same starting verb twice in a row or more than twice total.
-5. Include quantifiable, plausible achievements conservatively inferred from context. Never fabricate specific employers, job titles, degrees, projects, certifications, or credentials that were not provided by the candidate.
-6. Section headers must use standard resume terminology only: "Professional Summary", "Core Skills", "Experience", "Projects", "Certifications".
-7. ABSOLUTE RULE — TRUTHFULNESS: Only include a skill, tool, technology, project, or certification if it is explicitly present in the candidate's data provided below. Never invent, assume, or infer unstated items, even if the job description mentions them.
-8. EMPTY SECTIONS RULE — CRITICAL: If the candidate has NO work experience entries (marked "NONE" below), return an EMPTY array for "experience" — do not invent a placeholder job. Apply the same rule independently to "projects" and "certifications": if marked "NONE", return an empty array for that field. Do not fabricate entries to fill a section.
+5. Never fabricate specific employers, job titles, degrees, projects, certifications, or credentials that were not provided by the candidate.
+6. Section headers must use standard resume terminology only: "Professional Summary", "Core Skills", "Education", "Experience", "Projects", "Certifications".
+7. ABSOLUTE RULE — TRUTHFULNESS: Only include a skill, tool, school, degree, project, or certification if it is explicitly present in the candidate's data provided below.
+8. EMPTY SECTIONS RULE: If a section is marked "NONE" below, return an EMPTY array for it — do not fabricate entries.
+${isLowMatch ? `9. GENERAL RESUME MODE — this candidate's background has very little real overlap with this specific job (computed match: ${matchPercentage}%). Do NOT force-fit job-description keywords into the resume, and do NOT omit or downplay any of the candidate's real skills or experience entries to make it look targeted. Include ALL of the candidate's real skills and ALL of their real experience entries — produce a clean, general, well-structured, strictly truthful resume of their FULL background, suitable for applying broadly across roles, not narrowed to this one job. It's expected that "keywordsMatched" will be empty or very short in this mode.` : ''}
 
 Field rules for the JSON you produce:
 - fullName, targetJobTitle, location: strings.
-- professionalSummary: 3-4 sentences, resume-summary style (no "I"), naturally weaving in keywords ONLY where the candidate's real background supports them. If the candidate has very little real data, keep the summary honest and modest rather than padded.
-- coreSkills: array of the candidate's REAL skills only. Ordered by relevance to this job, most relevant first.
-- experience: array preserving every real role given, same order, each with title/company/duration/location/bullets (3-5 achievement bullets). Empty array if candidate has none.
-- projects: array of the candidate's REAL projects only, each with title, description (1-2 sentences, may lightly emphasize relevance to the target job if genuinely applicable), and link (omit or empty string if none). Empty array if candidate has none.
-- certifications: array of the candidate's REAL certifications only, each with name, issuer, date. Empty array if candidate has none.
-- keywordsMatched: array of terms from the job description this resume genuinely and truthfully incorporates.`;
+- professionalSummary: 3-4 sentences, resume-summary style (no "I")${isLowMatch ? ', written generally around the candidate\'s full real background rather than tailored to this specific job' : ', naturally weaving in keywords ONLY where the candidate\'s real background supports them'}.
+- coreSkills: array of ALL of the candidate's REAL skills.${isLowMatch ? ' Include every one — do not trim.' : ' Ordered by relevance to this job, most relevant first, but include all of them.'}
+- education: array of the candidate's REAL education entries only, each with school/degree/fieldOfStudy/duration. Empty array if candidate has none.
+- experience: array preserving EVERY real role given, same order, each with title/company/duration/location/bullets. Empty array if candidate has none.
+- projects: array of the candidate's REAL projects only. Empty array if candidate has none.
+- certifications: array of the candidate's REAL certifications only. Empty array if candidate has none.
+- keywordsMatched: array of terms from the job description this resume genuinely and truthfully incorporates.${isLowMatch ? ' May be empty — do not pad it.' : ''}`;
 
-    const userPrompt = `Create a tailored, ATS-optimized, and strictly truthful resume for this candidate applying to this specific job. Only use skills, experience, projects, and certifications the candidate actually has. Omit any section with no real underlying data rather than fabricating content.
+    const userPrompt = `Create a ${isLowMatch ? 'general, well-structured, full-background' : 'tailored, ATS-optimized'}, and strictly truthful resume for this candidate${isLowMatch ? '' : ' applying to this specific job'}. Only use skills, education, experience, projects, and certifications the candidate actually has.
 
 === CANDIDATE PROFILE ===
 Full Name: ${user.f_name || 'Not specified'}
@@ -145,6 +178,9 @@ Current Company: ${user.curr_company || 'Not specified'}
 Current Location: ${user.curr_location || 'Not specified'}
 About / Bio: ${user.about || 'Not specified'}
 Existing Skills: ${skillsList}
+
+Education:
+${educationList}
 
 Work Experience:
 ${experienceList}
@@ -173,6 +209,19 @@ Generate the resume content now as a single JSON object matching the schema in y
             location: { type: "STRING" },
             professionalSummary: { type: "STRING" },
             coreSkills: { type: "ARRAY", items: { type: "STRING" } },
+            education: {
+                type: "ARRAY",
+                items: {
+                    type: "OBJECT",
+                    properties: {
+                        school: { type: "STRING" },
+                        degree: { type: "STRING" },
+                        fieldOfStudy: { type: "STRING" },
+                        duration: { type: "STRING" }
+                    },
+                    required: ["school", "degree"]
+                }
+            },
             experience: {
                 type: "ARRAY",
                 items: {
@@ -213,7 +262,7 @@ Generate the resume content now as a single JSON object matching the schema in y
             },
             keywordsMatched: { type: "ARRAY", items: { type: "STRING" } }
         },
-        required: ["fullName", "targetJobTitle", "location", "professionalSummary", "coreSkills", "experience", "projects", "certifications", "keywordsMatched"]
+        required: ["fullName", "targetJobTitle", "location", "professionalSummary", "coreSkills", "education", "experience", "projects", "certifications", "keywordsMatched"]
     };
 
     const requestBody = {

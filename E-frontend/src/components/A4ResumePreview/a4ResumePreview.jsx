@@ -84,6 +84,22 @@ const A4ResumePreview = ({ cv, innerRef, scale }) => {
                 </div>
             )}
 
+            {cv.education?.length > 0 && (
+                <div className="mb-7">
+                    <h2 className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">Education</h2>
+                    <div className="flex flex-col gap-3">
+                        {cv.education.map((edu, i) => (
+                            <div key={i} className="flex justify-between items-baseline flex-wrap gap-x-3">
+                                <p className="text-sm font-semibold text-gray-900">
+                                    {edu.school} {edu.degree && <span className="font-normal text-gray-500">· {edu.degree}{edu.fieldOfStudy ? `, ${edu.fieldOfStudy}` : ''}</span>}
+                                </p>
+                                {edu.duration && <p className="text-xs text-gray-500 whitespace-nowrap">{edu.duration}</p>}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {cv.certifications?.length > 0 && (
                 <div>
                     <h2 className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-3">Certifications</h2>

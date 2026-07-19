@@ -86,7 +86,7 @@ exports.updateUser = async (req, res) => {
         const { user } = req.body;
         if (!user) return res.status(400).json({ error: 'User update data is required' });
 
-        const allowedUpdates = {
+const allowedUpdates = {
             f_name: user.f_name,
             headline: user.headline,
             curr_company: user.curr_company,
@@ -96,13 +96,13 @@ exports.updateUser = async (req, res) => {
             about: user.about,
             skills: user.skills,
             experience: user.experience,
+            education: user.education,
             projects: user.projects,
             certifications: user.certifications,
             phone: user.phone,
             payoutEmail: user.payoutEmail,
             payoutCardHolder: user.payoutCardHolder,
         };
-
         // Never persist a full card number — only keep the last 4 digits.
         if (typeof user.payoutCardNumber === 'string' && user.payoutCardNumber.trim().length > 0) {
             const digitsOnly = user.payoutCardNumber.replace(/\D/g, '');
