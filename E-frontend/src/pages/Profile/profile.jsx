@@ -299,7 +299,7 @@ const Profile = () => {
                                 <div className='text-xl'>About</div>
                                 {isOwnProfile && <div onClick={handleEditingAbout} className='cursor-pointer'><EditIcon /></div>}
                             </div>
-                            {!editingAbout && <div className='text-gray-700 text-md w-[80%]'>{userData?.about}</div>}
+                            {!editingAbout && <div className='text-gray-700 text-sm w-[80%]'>{userData?.about}</div>}
                             {editingAbout && (
                                 <div className='mt-1'>
                                     <textarea
