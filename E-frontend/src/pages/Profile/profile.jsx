@@ -22,6 +22,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import EditIcon from '@mui/icons-material/Edit';
 import BackButton from '../../components/BackButton/backButton';
+import Button from '../../components/Button/button';
 
 const Profile = () => {
     const { id } = useParams();
@@ -236,13 +237,13 @@ const Profile = () => {
 
                                         <div className='md:flex w-full justify-between'>
                                             <div className="my-5 flex gap-5">
-                                                <div className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold" onClick={copyToClipboard}>Copy link</div>
-                                                {isOwnProfile && <div onClick={handleLogout} className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">Sign out</div>}
+                                                <Button onClick={copyToClipboard}>Copy link</Button>
+                                                {isOwnProfile && <Button onClick={handleLogout}>Sign out</Button>}
                                             </div>
 
                                             <div className="my-5 flex gap-5">
-                                                {amIfriend() ? <div onClick={handleMessageModal} className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">Message</div> : null}
-                                                {isOwnProfile ? null : <div onClick={handleSendFriendRequest} className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">{checkFriendStatus()}</div>}
+                                                {amIfriend() ? <Button onClick={handleMessageModal}>Message</Button> : null}
+                                                {isOwnProfile ? null : <Button onClick={handleSendFriendRequest}>{checkFriendStatus()}</Button>}
                                             </div>
                                         </div>
                                     </div>
