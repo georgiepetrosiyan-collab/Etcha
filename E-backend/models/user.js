@@ -17,12 +17,22 @@ const UserSchema = new mongoose.Schema({
     cover_pic: { type: String, default: 'https://wallpaperaccess.com/full/6060285.png' },
     about: { type: String, default: "" },
     skills: { type: [String], default: [] },
-    experience: [
+experience: [
         {
             designation: { type: String },
             company_name: { type: String },
             duration: { type: String },
             location: { type: String },
+        }
+    ],
+experience: [
+        {
+            designation: { type: String },
+            company_name: { type: String },
+            startDate: { type: String },
+            endDate: { type: String }, // "Present" if ongoing
+            location: { type: String },
+            description: { type: String, default: "" }, // optional — what they actually did
         }
     ],
     projects: [

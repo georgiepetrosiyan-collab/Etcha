@@ -6,8 +6,10 @@ const ExpModal = ({ handleEditFunc, selfData, updateExp, setUpdateExp }) => {
     const [data, setData] = useState({
         designation: updateExp?.clicked ? updateExp?.data?.designation : "",
         company_name: updateExp?.clicked ? updateExp?.data?.company_name : "",
-        duration: updateExp?.clicked ? updateExp?.data?.duration : "",
-        location: updateExp?.clicked ? updateExp?.data?.location : ""
+        startDate: updateExp?.clicked ? updateExp?.data?.startDate : "",
+        endDate: updateExp?.clicked ? updateExp?.data?.endDate : "",
+        location: updateExp?.clicked ? updateExp?.data?.location : "",
+        description: updateExp?.clicked ? updateExp?.data?.description : ""
     })
 
     const onChangeHandle = (event, key) => {
@@ -22,7 +24,6 @@ const ExpModal = ({ handleEditFunc, selfData, updateExp, setUpdateExp }) => {
     }
 
     const handleOnSave = () => {
-
         if (updateExp?.clicked) return updateExpSave();
 
         let expArr = [...selfData?.experience, data];
@@ -49,15 +50,27 @@ const ExpModal = ({ handleEditFunc, selfData, updateExp, setUpdateExp }) => {
                 <br />
                 <input type='text' value={data.company_name} onChange={(e) => onChangeHandle(e, 'company_name')} className='p-2 mt-1 w-full border rounded-md' placeholder='Enter Company Name' />
             </div>
-            <div className='w-full mb-4'>
-                <label>Duration*</label>
-                <br />
-                <input type='text' value={data.duration} onChange={(e) => onChangeHandle(e, 'duration')} className='p-2 mt-1 w-full border rounded-md' placeholder='Enter Duration' />
+            <div className='flex gap-3 w-full mb-4'>
+                <div className='flex-1'>
+                    <label>Start Date*</label>
+                    <br />
+                    <input type='text' value={data.startDate} onChange={(e) => onChangeHandle(e, 'startDate')} className='p-2 mt-1 w-full border rounded-md' placeholder='e.g. Jan 2022' />
+                </div>
+                <div className='flex-1'>
+                    <label>End Date</label>
+                    <br />
+                    <input type='text' value={data.endDate} onChange={(e) => onChangeHandle(e, 'endDate')} className='p-2 mt-1 w-full border rounded-md' placeholder='e.g. Present' />
+                </div>
             </div>
             <div className='w-full mb-4'>
                 <label>Place*</label>
                 <br />
                 <input type='text' value={data.location} onChange={(e) => onChangeHandle(e, 'location')} className='p-2 mt-1 w-full border rounded-md' placeholder='Enter Location' />
+            </div>
+            <div className='w-full mb-4'>
+                <label>Description <span className='text-gray-400 text-sm'>(optional)</span></label>
+                <br />
+                <textarea value={data.description} onChange={(e) => onChangeHandle(e, 'description')} className='p-2 mt-1 w-full border rounded-md' rows={3} placeholder="What did you actually do in this role? Leave blank and we'll infer reasonable achievements for the CV." />
             </div>
 
             <div className='flex justify-between'>

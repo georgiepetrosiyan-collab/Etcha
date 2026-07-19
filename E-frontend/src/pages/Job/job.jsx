@@ -13,6 +13,9 @@ import WorkIcon from '@mui/icons-material/Work';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import GroupsIcon from '@mui/icons-material/Groups';
 
+// FIX 1: Added missing import for Navbar_3
+import Navbar_3 from '../../components/NavBar_3/navbar_3';
+
 const Job = () => {
     const { jobId } = useParams();
     const navigate = useNavigate();
@@ -20,6 +23,7 @@ const Job = () => {
     const [ownData, setOwnData] = useState(null);
     const [availableJobs, setAvailableJobs] = useState([]);
     const [myJobs, setMyJobs] = useState([]);
+    const [notificationCount, setNotificationCount] = useState(0); // FIX 2: Added notification state
     const [activeTab, setActiveTab] = useState('available'); // 'available' | 'mine' | 'referrals'
     const [loading, setLoading] = useState(true);
     const [isPostOpen, setIsPostOpen] = useState(false);
@@ -29,6 +33,7 @@ const Job = () => {
         const userData = localStorage.getItem('userInfo');
         setOwnData(userData ? JSON.parse(userData) : null);
         fetchJobs();
+        fetchNotification(); // FIX 2: Fetch notifications on load
     }, []);
 
     useEffect(() => {
@@ -54,6 +59,16 @@ const Job = () => {
                 toast.error(err?.response?.data?.error || "Something Went Wrong");
             })
             .finally(() => setLoading(false));
+    };
+
+    // FIX 2: Added missing API helper to update notification badges inside navbar
+    const fetchNotification = async () => {
+        try {
+            const res = await axios.get('http://localhost:4000/api/notification/activeNotification', { withCredentials: true });
+            setNotificationCount(res.data.count || 0);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     const handleJobCreated = (newJob) => {
@@ -85,8 +100,14 @@ const Job = () => {
 
     return (
         <div className="px-5 xl:px-50 py-9 flex gap-5 w-full mt-5 bg-gray-100 min-h-screen">
+            {/* Left Side Bar */}
             <div className="w-[21%] sm:block sm:w-[23%] hidden py-5">
-                <div className="h-fit"><ProfileCard data={ownData} /></div>
+                <div className="h-left">
+                    {/* FIX 3: Replaced personalData with ownData */}
+                    <ProfileCard data={ownData} />
+                </div>
+                {/* FIX 3: Replaced personalData with ownData */}
+                <Navbar_3 userData={ownData} notificationCount={notificationCount} />
             </div>
 
             <div className="w-full py-5 sm:w-[50%] flex flex-col gap-4">

@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import FactCheckIcon from '@mui/icons-material/FactCheck'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 
 const getScoreColor = (score) => {
     if (score >= 70) return { text: 'text-green-700', bg: 'bg-green-100', ring: 'ring-green-200' };
@@ -12,9 +13,10 @@ const getScoreColor = (score) => {
     return { text: 'text-red-700', bg: 'bg-red-100', ring: 'ring-red-200' };
 };
 
-const ATSCheckModal = ({ cv, job, candidateName, onClose }) => {
+const ATSCheckModal = ({ cv, job, candidateName, applicantId, referralId, onClose, onRejected }) => {
     const [loading, setLoading] = useState(true);
     const [analysis, setAnalysis] = useState(null);
+    const [autoRejected, setAutoRejected] = useState(false);
 
     const stop = (e) => e.stopPropagation();
 
@@ -28,10 +30,20 @@ const ATSCheckModal = ({ cv, job, candidateName, onClose }) => {
         try {
             const res = await axios.post(
                 'http://localhost:4000/api/job/ats-check',
-                { cv, job: { title: job?.title, description: job?.description, fullDescription: job?.fullDescription } },
+                {
+                    cv,
+                    job: { title: job?.title, description: job?.description, fullDescription: job?.fullDescription },
+                    applicantId,
+                    jobId: job?._id,
+                    referralId
+                },
                 { withCredentials: true }
             );
             setAnalysis(res.data.analysis);
+            if (res.data.autoRejected) {
+                setAutoRejected(true);
+                onRejected?.();
+            }
         } catch (err) {
             console.log(err);
             toast.error(err?.response?.data?.error || "Failed to run ATS check");
@@ -70,6 +82,15 @@ const ATSCheckModal = ({ cv, job, candidateName, onClose }) => {
                     </button>
                 </div>
 
+                {autoRejected && !loading && (
+                    <div className="bg-red-50 border-b border-red-200 px-6 py-3 flex items-start gap-2 shrink-0">
+                        <WarningAmberIcon sx={{ color: "#dc2626", fontSize: 18 }} className="shrink-0 mt-0.5" />
+                        <p className="text-xs text-red-700">
+                            This score is below the pass bar — a message has been sent to {candidateName || 'the candidate'} from your account letting them know this application won't be moving forward.
+                        </p>
+                    </div>
+                )}
+
                 <div className="flex-1 overflow-y-auto px-6 py-5">
                     {loading && (
                         <div className="flex flex-col items-center justify-center gap-3 py-16">
@@ -89,7 +110,7 @@ const ATSCheckModal = ({ cv, job, candidateName, onClose }) => {
                                         {analysis.score >= 70 ? "Strong ATS match" : analysis.score >= 40 ? "Moderate ATS match" : "Weak ATS match"}
                                     </p>
                                     <p className="text-xs text-gray-600 mt-0.5">
-                                        {analysis.matchedKeywords.length} of {analysis.totalKeywords} job keywords found in this résumé
+                                        {analysis.matchedKeywords.length} of {analysis.totalKeywords} job keywords found in this résumé's skills, education & experience
                                     </p>
                                 </div>
                             </div>
