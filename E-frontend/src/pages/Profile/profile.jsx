@@ -39,6 +39,8 @@ const Profile = () => {
     const [projectsCertsModal, setProjectsCertsModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [editingAbout, setEditingAbout] = useState(false);
+    const [aboutDraft, setAboutDraft] = useState("");
 
     const [userData, setUserData] = useState(null);
     const [postData, setPostData] = useState([]);
@@ -99,6 +101,15 @@ const Profile = () => {
     const handlePayoutModal = () => setPayoutModal(prev => !prev);
     const handleProjectsCertsModal = () => setProjectsCertsModal(prev => !prev);
     const handleImageModalOpenClose = () => setImageModal(prev => !prev);
+    const handleEditingAbout = () => {
+        if (!editingAbout) setAboutDraft(userData?.about || "");
+        setEditingAbout(prev => !prev);
+    }
+
+    const handleSaveAbout = async () => {
+        await handleEditFunc({ about: aboutDraft });
+        setEditingAbout(false);
+    }
 
     const handleOnEditCover = () => { setImageModal(true); setCircularImage(false); }
     const handleCircularimageOpen = () => { setImageModal(true); setCircularImage(true); }
@@ -233,7 +244,7 @@ const Profile = () => {
                                         <div className="text-2xl">{userData?.f_name}</div>
                                         <div className="text-gray-700">{userData?.headline}</div>
                                         <div className="text-sm text-gray-500">{userData?.curr_location}</div>
-                                        <div className="text-md text-blue-800 w-fit cursor-pointer hover:underline">{userData?.friends?.length} Connections</div>
+                                        <div className="text-md text-accent w-fit cursor-pointer hover:underline">{userData?.friends?.length} Connections</div>
 
                                         <div className='md:flex w-full justify-between'>
                                             <div className="my-5 flex gap-5">
@@ -256,9 +267,22 @@ const Profile = () => {
                         <Card padding={1}>
                             <div className='flex justify-between items-center'>
                                 <div className='text-xl'>About</div>
-                                {isOwnProfile && <div onClick={handleAboutModal} className='cursor-pointer'><EditIcon /></div>}
+                                {isOwnProfile && <div onClick={handleEditingAbout} className='cursor-pointer'><EditIcon /></div>}
                             </div>
-                            <div className='text-gray-700 text-md w-[80%]'>{userData?.about}</div>
+                            {!editingAbout && <div className='text-gray-700 text-md w-[80%]'>{userData?.about}</div>}
+                            {editingAbout && (
+                                <div className='mt-1'>
+                                    <textarea
+                                        value={aboutDraft}
+                                        onChange={(e) => setAboutDraft(e.target.value)}
+                                        className="p-2 w-full border border-gray-500 rounded-md"
+                                        rows={3}
+                                    ></textarea>
+                                    <div className='mt-2 w-fit'>
+                                        <Button onClick={handleSaveAbout}>Save</Button>
+                                    </div>
+                                </div>
+                            )}
                         </Card>
                     </div>
 
