@@ -12,7 +12,6 @@ import Modal from '../../components/Modal/modal';
 import EducationModal from '../../components/EducationModal/educationModal';
 import ImageModal from '../../components/ImageModal/imageModal';
 import EditinfoModal from '../../components/EditInfoModal/editInfoModal';
-import AboutModal from '../../components/AboutModal/aboutModal';
 import ExpModal from '../../components/ExpModal/expModal';
 import MessageModal from '../../components/MessageModal/messageModal';
 import PayoutInfoModal from '../../components/PayoutInfoModal/payoutInfoModal';
@@ -32,7 +31,6 @@ const Profile = () => {
     const [circularImage, setCircularImage] = useState(true);
 
     const [infoModal, setInfoModal] = useState(false);
-    const [aboutModal, setAboutModal] = useState(false);
     const [expModal, setExpModal] = useState(false);
     const [messageModal, setMessageModal] = useState(false);
     const [payoutModal, setPayoutModal] = useState(false);
@@ -98,8 +96,6 @@ const Profile = () => {
         if (expModal) setUpdateExp({ clicked: "", id: "", datas: {} });
         setExpModal(prev => !prev);
     }
-
-    const handleAboutModal = () => setAboutModal(prev => !prev);
     const handleInfoModal = () => setInfoModal(prev => !prev);
     const handlePayoutModal = () => setPayoutModal(prev => !prev);
     const handleProjectsCertsModal = () => setProjectsCertsModal(prev => !prev);
@@ -547,12 +543,6 @@ const Profile = () => {
             {infoModal && (
                 <Modal title="Edit Info" closeModal={handleInfoModal}>
                     <EditinfoModal handleEditFunc={handleEditFunc} selfData={ownData} />
-                </Modal>
-            )}
-
-            {aboutModal && (
-                <Modal title="Edit About" closeModal={handleAboutModal}>
-                    <AboutModal handleEditFunc={handleEditFunc} selfData={ownData} />
                 </Modal>
             )}
 
