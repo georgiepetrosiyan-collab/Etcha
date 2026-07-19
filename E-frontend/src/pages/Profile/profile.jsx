@@ -205,7 +205,7 @@ const Profile = () => {
         <div className='px-5 xl:px-50 py-5 mt-5 flex flex-col gap-5 w-full pt-12 bg-gray-100'>
             <div className='flex justify-between'>
                 <div className='w-full md:w-[70%]'>
-                    <BackButton/>
+                    <BackButton className="mb-5"/>
                     <div>
                         <Card padding={0}>
                             <div className='w-full h-fit '>
