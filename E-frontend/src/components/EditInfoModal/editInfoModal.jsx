@@ -1,5 +1,6 @@
 //E/E-frontend/components/EditInfoModal/editInfoModal.jsx
 import React, { useState } from 'react'
+import Button from '../Button/button';
 
 const EditinfoModal = ({ handleEditFunc, selfData }) => {
 
@@ -37,7 +38,7 @@ const EditinfoModal = ({ handleEditFunc, selfData }) => {
                 <input type='text' value={data.curr_location} onChange={(e) => { onChangeHandle(e, 'curr_location') }} className='p-2 mt-1 w-full border rounded-md' placeholder='Enter Current Location' />
             </div>
 
-            <div className="bg-blue-950 text-white w-fit py-1 px-3 cursor-pointer rounded-2xl" onClick={handleSaveBtn}>Save</div>
+            <Button onClick={handleSaveBtn}>Save</Button>
         </div>
     )
 }

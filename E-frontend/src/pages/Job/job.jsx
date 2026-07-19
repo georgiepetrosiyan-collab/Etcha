@@ -6,7 +6,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 
 import ProfileCard from '../../components/ProfileCard/profileCard';
-import Navbar_3 from '../../components/NavBar_3/navbar_3';
+import Navbar_3 from '../../components/Navbar_3/navbar_3';
 import PostJobModal from '../../components/PostJobModal/postJobModal';
 import CreateCVModal from '../../components/CreateCVModal/createCVModal';
 import ApplicantsModal from '../../components/ApplicantsModal/applicantsModal';

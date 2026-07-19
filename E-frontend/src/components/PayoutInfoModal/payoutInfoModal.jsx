@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Button from '../Button/button';
 
 const PayoutInfoModal = ({ handleEditFunc, selfData }) => {
     const [data, setData] = useState({
@@ -53,7 +54,7 @@ const PayoutInfoModal = ({ handleEditFunc, selfData }) => {
                 For your security, we only store the last 4 digits of your card. Full card details are never saved.
             </p>
 
-            <div className="bg-blue-950 text-white w-fit py-1 px-3 cursor-pointer rounded-2xl" onClick={handleSave}>Save</div>
+            <Button onClick={handleSave}>Save</Button>
         </div>
     )
 }

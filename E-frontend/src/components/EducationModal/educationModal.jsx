@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Button from '../Button/button'
 
 const EducationModal = ({ handleEditFunc, selfData, updateEdu, setUpdateEdu }) => {
 
@@ -58,9 +59,9 @@ const EducationModal = ({ handleEditFunc, selfData, updateEdu, setUpdateEdu }) =
             </div>
 
             <div className='flex justify-between'>
-                <div className="bg-blue-950 text-white w-fit py-1 px-3 cursor-pointer rounded-2xl" onClick={handleOnSave}>Save</div>
+                <Button onClick={handleOnSave}>Save</Button>
                 {
-                    updateEdu?.clicked && <div className="bg-blue-950 text-white w-fit py-1 px-3 cursor-pointer rounded-2xl" onClick={handleOnDelete}>Delete</div>
+                    updateEdu?.clicked && <Button onClick={handleOnDelete}>Delete</Button>
                 }
             </div>
         </div>

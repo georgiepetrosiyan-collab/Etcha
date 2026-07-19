@@ -1,4 +1,4 @@
-//E/E-frontend/pages/Profile/profile.jsx 
+//E/E-frontend/pages/Profile/profile.jsx
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,6 @@ import Modal from '../../components/Modal/modal';
 import EducationModal from '../../components/EducationModal/educationModal';
 import ImageModal from '../../components/ImageModal/imageModal';
 import EditinfoModal from '../../components/EditInfoModal/editInfoModal';
-import AboutModal from '../../components/AboutModal/aboutModal';
 import ExpModal from '../../components/ExpModal/expModal';
 import MessageModal from '../../components/MessageModal/messageModal';
 import PayoutInfoModal from '../../components/PayoutInfoModal/payoutInfoModal';
@@ -21,6 +20,8 @@ import DeleteAccountModal from '../../components/DeleteAccountModal/deleteAccoun
 import AddIcon from '@mui/icons-material/Add';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import EditIcon from '@mui/icons-material/Edit';
+import BackButton from '../../components/BackButton/backButton';
+import Button from '../../components/Button/button';
 
 const Profile = () => {
     const { id } = useParams();
@@ -30,13 +31,17 @@ const Profile = () => {
     const [circularImage, setCircularImage] = useState(true);
 
     const [infoModal, setInfoModal] = useState(false);
-    const [aboutModal, setAboutModal] = useState(false);
     const [expModal, setExpModal] = useState(false);
     const [messageModal, setMessageModal] = useState(false);
     const [payoutModal, setPayoutModal] = useState(false);
     const [projectsCertsModal, setProjectsCertsModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [editingAbout, setEditingAbout] = useState(false);
+    const [aboutDraft, setAboutDraft] = useState("");
+    const [editingSkills, setEditingSkills] = useState(false);
+    const [skillsDraft, setSkillsDraft] = useState([]);
+    const [skillInput, setSkillInput] = useState("");
 
     const [userData, setUserData] = useState(null);
     const [postData, setPostData] = useState([]);
@@ -91,12 +96,50 @@ const Profile = () => {
         if (expModal) setUpdateExp({ clicked: "", id: "", datas: {} });
         setExpModal(prev => !prev);
     }
-
-    const handleAboutModal = () => setAboutModal(prev => !prev);
     const handleInfoModal = () => setInfoModal(prev => !prev);
     const handlePayoutModal = () => setPayoutModal(prev => !prev);
     const handleProjectsCertsModal = () => setProjectsCertsModal(prev => !prev);
     const handleImageModalOpenClose = () => setImageModal(prev => !prev);
+    const handleEditingAbout = () => {
+        if (!editingAbout) setAboutDraft(userData?.about || "");
+        setEditingAbout(prev => !prev);
+    }
+
+    const handleSaveAbout = async () => {
+        await handleEditFunc({ about: aboutDraft });
+        setEditingAbout(false);
+    }
+
+    const handleEditingSkills = () => {
+        if (!editingSkills) setSkillsDraft(userData?.skills || []);
+        setSkillInput("");
+        setEditingSkills(prev => !prev);
+    }
+
+    const handleSkillInputChange = (e) => {
+        const value = e.target.value;
+        if (value.includes(",")) {
+            const newSkill = value.split(",")[0].trim();
+            if (newSkill && !skillsDraft.includes(newSkill)) {
+                setSkillsDraft(prev => [...prev, newSkill]);
+            }
+            setSkillInput("");
+        } else {
+            setSkillInput(value);
+        }
+    }
+
+    const handleRemoveSkill = (skillToRemove) => {
+        setSkillsDraft(prev => prev.filter(s => s !== skillToRemove));
+    }
+
+    const handleSaveSkills = async () => {
+        let finalSkills = [...skillsDraft];
+        const trimmed = skillInput.trim();
+        if (trimmed && !finalSkills.includes(trimmed)) finalSkills.push(trimmed);
+        await handleEditFunc({ skills: finalSkills });
+        setEditingSkills(false);
+    }
 
     const handleOnEditCover = () => { setImageModal(true); setCircularImage(false); }
     const handleCircularimageOpen = () => { setImageModal(true); setCircularImage(true); }
@@ -190,7 +233,7 @@ const Profile = () => {
 
     const copyToClipboard = async () => {
         try {
-            let string = `http://localhost:5173/profile/${id}`
+            let string = `${window.location.origin}/profile/${id}`
             await navigator.clipboard.writeText(string);
             toast.success("Copied to clipboard");
         } catch (err) {
@@ -203,8 +246,8 @@ const Profile = () => {
     return (
         <div className='px-5 xl:px-50 py-5 mt-5 flex flex-col gap-5 w-full pt-12 bg-gray-100'>
             <div className='flex justify-between'>
-
                 <div className='w-full md:w-[70%]'>
+                    <BackButton className="mb-5"/>
                     <div>
                         <Card padding={0}>
                             <div className='w-full h-fit '>
@@ -228,21 +271,20 @@ const Profile = () => {
                                         </div>
                                     )}
                                     <div className='w-full'>
-                                        <div className="text-2xl">{userData?.f_name}</div>
+                                        <div className="text-2xl font-semibold">{userData?.f_name}</div>
                                         <div className="text-gray-700">{userData?.headline}</div>
                                         <div className="text-sm text-gray-500">{userData?.curr_location}</div>
-                                        <div className="text-md text-blue-800 w-fit cursor-pointer hover:underline">{userData?.friends?.length} Connections</div>
+                                        <div className="text-md text-accent w-fit cursor-pointer hover:underline">{userData?.friends?.length} Connections</div>
 
                                         <div className='md:flex w-full justify-between'>
                                             <div className="my-5 flex gap-5">
-                                                <div className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">Open to</div>
-                                                <div className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold" onClick={copyToClipboard}>Share</div>
-                                                {isOwnProfile && <div onClick={handleLogout} className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">Logout</div>}
+                                                <Button onClick={copyToClipboard}>Copy link</Button>
+                                                {isOwnProfile && <Button onClick={handleLogout}>Sign out</Button>}
                                             </div>
 
                                             <div className="my-5 flex gap-5">
-                                                {amIfriend() ? <div onClick={handleMessageModal} className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">Message</div> : null}
-                                                {isOwnProfile ? null : <div onClick={handleSendFriendRequest} className="cursor-pointer p-2 border rounded-lg bg-blue-800 text-white font-semibold">{checkFriendStatus()}</div>}
+                                                {amIfriend() ? <Button onClick={handleMessageModal}>Message</Button> : null}
+                                                {isOwnProfile ? null : <Button onClick={handleSendFriendRequest}>{checkFriendStatus()}</Button>}
                                             </div>
                                         </div>
                                     </div>
@@ -254,10 +296,23 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className='flex justify-between items-center'>
-                                <div className='text-xl'>About</div>
-                                {isOwnProfile && <div onClick={handleAboutModal} className='cursor-pointer'><EditIcon /></div>}
+                                <div className='text-xl font-semibold '>About</div>
+                                {isOwnProfile && <div onClick={handleEditingAbout} className='cursor-pointer'><EditIcon /></div>}
                             </div>
-                            <div className='text-gray-700 text-md w-[80%]'>{userData?.about}</div>
+                            {!editingAbout && <div className='text-gray-700 text-sm w-[80%]'>{userData?.about}</div>}
+                            {editingAbout && (
+                                <div className='mt-1'>
+                                    <textarea
+                                        value={aboutDraft}
+                                        onChange={(e) => setAboutDraft(e.target.value)}
+                                        className="p-2 w-full border border-gray-500 rounded-md"
+                                        rows={3}
+                                    ></textarea>
+                                    <div className='mt-2 w-fit'>
+                                        <Button onClick={handleSaveAbout}>Save</Button>
+                                    </div>
+                                </div>
+                            )}
                         </Card>
                     </div>
 
@@ -265,7 +320,7 @@ const Profile = () => {
                         <div className='mt-5'>
                             <Card padding={1}>
                                 <div className='flex justify-between items-center'>
-                                    <div className='text-xl'>Referral Payout Info</div>
+                                    <div className='text-xl font-semibold'>Referral Payout Info</div>
                                     <div onClick={handlePayoutModal} className='cursor-pointer'><EditIcon /></div>
                                 </div>
                                 <p className='text-sm text-gray-500 mb-2'>Used to pay you when someone you referred gets hired.</p>
@@ -299,23 +354,46 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className='flex justify-between items-center'>
-                                <div className='text-xl'>Skills</div>
+                                <div className='text-xl font-semibold'>Skills</div>
+                                {isOwnProfile && <div onClick={handleEditingSkills} className='cursor-pointer'><EditIcon /></div>}
                             </div>
-                            <div className='text-gray-700 text-md my-2 w-full flex gap-4 flex-wrap'>
-                                {userData?.skills?.map((item, index) => (
-                                    <div key={index} className='py-2 px-3 cursor-pointer bg-blue-800 text-white rounded-lg'>{item}</div>
-                                ))}
-                            </div>
+                            {!editingSkills && (
+                                <div className='text-gray-700 text-md my-2 w-full flex gap-2 flex-wrap'>
+                                    {userData?.skills?.map((item, index) => (
+                                        <div key={index} className='py-1 px-2 border cursor-default border-accent text-accent rounded-lg text-sm'>{item}</div>
+                                    ))}
+                                </div>
+                            )}
+                            {editingSkills && (
+                                <div className='mt-2'>
+                                    <div className='flex gap-2 flex-wrap mb-2'>
+                                        {skillsDraft.map((item, index) => (
+                                            <div key={index} className='py-1 px-2 border border-accent text-accent rounded-lg text-sm flex items-center gap-1'>
+                                                <span>{item}</span>
+                                                <span onClick={() => handleRemoveSkill(item)} className='cursor-pointer text-gray-500 hover:text-red-600'>&times;</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={skillInput}
+                                        onChange={handleSkillInputChange}
+                                        placeholder="Type skills (separated by commas)"
+                                        className="p-2 w-full border border-gray-400 rounded-md text-sm"
+                                    />
+                                    <div className='mt-2 w-fit'>
+                                        <Button onClick={handleSaveSkills}>Save</Button>
+                                    </div>
+                                </div>
+                            )}
                         </Card>
                     </div>
 
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className='flex justify-between items-center'>
-                                <div className='text-xl'>Activities</div>
+                                <div className='text-xl font-semibold'>Recent posts</div>
                             </div>
-
-                            <div className='cursor-pointer px-3 py-1 w-fit border rounded-4xl bg-green-800 text-white font-semibold mt-2'>Posts</div>
 
                             <div className="overflow-x-auto my-2 flex gap-1 overflow-y-hidden w-full items-start">
                                 {postData.map((item, ind) => (
@@ -340,7 +418,7 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className="flex justify-between items-center">
-                                <div className="text-xl">Experience</div>
+                                <div className="text-xl font-semibold">Experience</div>
                                 {isOwnProfile && <div onClick={handleExpModal} className="cursor-pointer"><AddIcon /></div>}
                             </div>
                             <div className='mt-5'>
@@ -371,7 +449,7 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className="flex justify-between items-center">
-                                <div className="text-xl">Education</div>
+                                <div className="text-xl font-semibold">Education</div>
                                 {isOwnProfile && <div onClick={handleEduModal} className="cursor-pointer"><AddIcon /></div>}
                             </div>
                             <div className='mt-5'>
@@ -401,7 +479,7 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className="flex justify-between items-center">
-                                <div className="text-xl">Projects & Certifications</div>
+                                <div className="text-xl font-semibold">Projects & Certifications</div>
                                 {isOwnProfile && <div onClick={handleProjectsCertsModal} className="cursor-pointer"><EditIcon /></div>}
                             </div>
 
@@ -433,7 +511,7 @@ const Profile = () => {
                     {isOwnProfile && (
                         <div className='mt-5'>
                             <Card padding={1}>
-                                <div className='text-xl text-red-700 mb-1'>Danger Zone</div>
+                                <div className='text-xl font-semibold text-red-700 mb-1'>Danger Zone</div>
                                 <p className='text-sm text-gray-500 mb-3'>Permanently delete your account and all associated data.</p>
                                 <div
                                     onClick={() => setDeleteModal(true)}
@@ -463,12 +541,6 @@ const Profile = () => {
             {infoModal && (
                 <Modal title="Edit Info" closeModal={handleInfoModal}>
                     <EditinfoModal handleEditFunc={handleEditFunc} selfData={ownData} />
-                </Modal>
-            )}
-
-            {aboutModal && (
-                <Modal title="Edit About" closeModal={handleAboutModal}>
-                    <AboutModal handleEditFunc={handleEditFunc} selfData={ownData} />
                 </Modal>
             )}
 
