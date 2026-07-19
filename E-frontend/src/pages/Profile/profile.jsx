@@ -41,6 +41,9 @@ const Profile = () => {
     const [deleting, setDeleting] = useState(false);
     const [editingAbout, setEditingAbout] = useState(false);
     const [aboutDraft, setAboutDraft] = useState("");
+    const [editingSkills, setEditingSkills] = useState(false);
+    const [skillsDraft, setSkillsDraft] = useState([]);
+    const [skillInput, setSkillInput] = useState("");
 
     const [userData, setUserData] = useState(null);
     const [postData, setPostData] = useState([]);
@@ -109,6 +112,37 @@ const Profile = () => {
     const handleSaveAbout = async () => {
         await handleEditFunc({ about: aboutDraft });
         setEditingAbout(false);
+    }
+
+    const handleEditingSkills = () => {
+        if (!editingSkills) setSkillsDraft(userData?.skills || []);
+        setSkillInput("");
+        setEditingSkills(prev => !prev);
+    }
+
+    const handleSkillInputChange = (e) => {
+        const value = e.target.value;
+        if (value.includes(",")) {
+            const newSkill = value.split(",")[0].trim();
+            if (newSkill && !skillsDraft.includes(newSkill)) {
+                setSkillsDraft(prev => [...prev, newSkill]);
+            }
+            setSkillInput("");
+        } else {
+            setSkillInput(value);
+        }
+    }
+
+    const handleRemoveSkill = (skillToRemove) => {
+        setSkillsDraft(prev => prev.filter(s => s !== skillToRemove));
+    }
+
+    const handleSaveSkills = async () => {
+        let finalSkills = [...skillsDraft];
+        const trimmed = skillInput.trim();
+        if (trimmed && !finalSkills.includes(trimmed)) finalSkills.push(trimmed);
+        await handleEditFunc({ skills: finalSkills });
+        setEditingSkills(false);
     }
 
     const handleOnEditCover = () => { setImageModal(true); setCircularImage(false); }
@@ -325,12 +359,37 @@ const Profile = () => {
                         <Card padding={1}>
                             <div className='flex justify-between items-center'>
                                 <div className='text-xl'>Skills</div>
+                                {isOwnProfile && <div onClick={handleEditingSkills} className='cursor-pointer'><EditIcon /></div>}
                             </div>
-                            <div className='text-gray-700 text-md my-2 w-full flex gap-2 flex-wrap'>
-                                {userData?.skills?.map((item, index) => (
-                                    <div key={index} className='py-1 px-2 border cursor-default border-accent text-accent rounded-lg text-sm'>{item}</div>
-                                ))}
-                            </div>
+                            {!editingSkills && (
+                                <div className='text-gray-700 text-md my-2 w-full flex gap-2 flex-wrap'>
+                                    {userData?.skills?.map((item, index) => (
+                                        <div key={index} className='py-1 px-2 border cursor-default border-accent text-accent rounded-lg text-sm'>{item}</div>
+                                    ))}
+                                </div>
+                            )}
+                            {editingSkills && (
+                                <div className='mt-2'>
+                                    <div className='flex gap-2 flex-wrap mb-2'>
+                                        {skillsDraft.map((item, index) => (
+                                            <div key={index} className='py-1 px-2 border border-accent text-accent rounded-lg text-sm flex items-center gap-1'>
+                                                <span>{item}</span>
+                                                <span onClick={() => handleRemoveSkill(item)} className='cursor-pointer text-gray-500 hover:text-red-600'>&times;</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={skillInput}
+                                        onChange={handleSkillInputChange}
+                                        placeholder="Type skills (separated by commas)"
+                                        className="p-2 w-full border border-gray-400 rounded-md text-sm"
+                                    />
+                                    <div className='mt-2 w-fit'>
+                                        <Button onClick={handleSaveSkills}>Save</Button>
+                                    </div>
+                                </div>
+                            )}
                         </Card>
                     </div>
 
