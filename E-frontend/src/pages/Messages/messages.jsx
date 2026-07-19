@@ -9,7 +9,7 @@ import socket from '../../../socket';
 
 // Importing your components
 import ProfileCard from '../../components/ProfileCard/profileCard';
-import Navbar_3 from '../../components/NavBar_3/navbar_3';
+import Navbar_3 from '../../components/Navbar_3/navbar_3';
 import Advertisement from '../../components/Advertisement/advertisement';
 
 const API_BASE_URL = 'http://localhost:4000/api';

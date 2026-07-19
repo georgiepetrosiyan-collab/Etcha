@@ -12,7 +12,7 @@ import AddModal from '../../components/AddModal/addModal';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import Modal from '../../components/Modal/modal';
-import Navbar_3 from '../../components/NavBar_3/navbar_3';
+import Navbar_3 from '../../components/Navbar_3/navbar_3';
 
 const Feeds = () => {
     const [personalData, setPersonalData] = useState(null);

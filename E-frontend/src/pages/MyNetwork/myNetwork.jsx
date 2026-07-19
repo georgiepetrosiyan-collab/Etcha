@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProfileCard from '../../components/ProfileCard/profileCard';
-import Navbar_3 from '../../components/NavBar_3/navbar_3';
+import Navbar_3 from '../../components/Navbar_3/navbar_3';
 import Advertisement from '../../components/Advertisement/advertisement';
 import Card from '../../components/Card/card';
 

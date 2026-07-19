@@ -14,7 +14,7 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import GroupsIcon from '@mui/icons-material/Groups';
 
 // FIX 1: Added missing import for Navbar_3
-import Navbar_3 from '../../components/NavBar_3/navbar_3';
+import Navbar_3 from '../../components/Navbar_3/navbar_3';
 
 const Job = () => {
     const { jobId } = useParams();
