@@ -21,6 +21,7 @@ import DeleteAccountModal from '../../components/DeleteAccountModal/deleteAccoun
 import AddIcon from '@mui/icons-material/Add';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import EditIcon from '@mui/icons-material/Edit';
+import BackButton from '../../components/BackButton/backButton';
 
 const Profile = () => {
     const { id } = useParams();
@@ -203,8 +204,8 @@ const Profile = () => {
     return (
         <div className='px-5 xl:px-50 py-5 mt-5 flex flex-col gap-5 w-full pt-12 bg-gray-100'>
             <div className='flex justify-between'>
-
                 <div className='w-full md:w-[70%]'>
+                    <BackButton/>
                     <div>
                         <Card padding={0}>
                             <div className='w-full h-fit '>
