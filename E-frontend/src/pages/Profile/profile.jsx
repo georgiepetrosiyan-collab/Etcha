@@ -271,7 +271,7 @@ const Profile = () => {
                                         </div>
                                     )}
                                     <div className='w-full'>
-                                        <div className="text-2xl">{userData?.f_name}</div>
+                                        <div className="text-2xl font-semibold">{userData?.f_name}</div>
                                         <div className="text-gray-700">{userData?.headline}</div>
                                         <div className="text-sm text-gray-500">{userData?.curr_location}</div>
                                         <div className="text-md text-accent w-fit cursor-pointer hover:underline">{userData?.friends?.length} Connections</div>
@@ -296,7 +296,7 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className='flex justify-between items-center'>
-                                <div className='text-xl'>About</div>
+                                <div className='text-xl font-semibold '>About</div>
                                 {isOwnProfile && <div onClick={handleEditingAbout} className='cursor-pointer'><EditIcon /></div>}
                             </div>
                             {!editingAbout && <div className='text-gray-700 text-sm w-[80%]'>{userData?.about}</div>}
@@ -320,7 +320,7 @@ const Profile = () => {
                         <div className='mt-5'>
                             <Card padding={1}>
                                 <div className='flex justify-between items-center'>
-                                    <div className='text-xl'>Referral Payout Info</div>
+                                    <div className='text-xl font-semibold'>Referral Payout Info</div>
                                     <div onClick={handlePayoutModal} className='cursor-pointer'><EditIcon /></div>
                                 </div>
                                 <p className='text-sm text-gray-500 mb-2'>Used to pay you when someone you referred gets hired.</p>
@@ -354,7 +354,7 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className='flex justify-between items-center'>
-                                <div className='text-xl'>Skills</div>
+                                <div className='text-xl font-semibold'>Skills</div>
                                 {isOwnProfile && <div onClick={handleEditingSkills} className='cursor-pointer'><EditIcon /></div>}
                             </div>
                             {!editingSkills && (
@@ -392,7 +392,7 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className='flex justify-between items-center'>
-                                <div className='text-xl'>Recent posts</div>
+                                <div className='text-xl font-semibold'>Recent posts</div>
                             </div>
 
                             <div className="overflow-x-auto my-2 flex gap-1 overflow-y-hidden w-full items-start">
@@ -418,7 +418,7 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className="flex justify-between items-center">
-                                <div className="text-xl">Experience</div>
+                                <div className="text-xl font-semibold">Experience</div>
                                 {isOwnProfile && <div onClick={handleExpModal} className="cursor-pointer"><AddIcon /></div>}
                             </div>
                             <div className='mt-5'>
@@ -449,7 +449,7 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className="flex justify-between items-center">
-                                <div className="text-xl">Education</div>
+                                <div className="text-xl font-semibold">Education</div>
                                 {isOwnProfile && <div onClick={handleEduModal} className="cursor-pointer"><AddIcon /></div>}
                             </div>
                             <div className='mt-5'>
@@ -479,7 +479,7 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className="flex justify-between items-center">
-                                <div className="text-xl">Projects & Certifications</div>
+                                <div className="text-xl font-semibold">Projects & Certifications</div>
                                 {isOwnProfile && <div onClick={handleProjectsCertsModal} className="cursor-pointer"><EditIcon /></div>}
                             </div>
 
@@ -511,7 +511,7 @@ const Profile = () => {
                     {isOwnProfile && (
                         <div className='mt-5'>
                             <Card padding={1}>
-                                <div className='text-xl text-red-700 mb-1'>Danger Zone</div>
+                                <div className='text-xl font-semibold text-red-700 mb-1'>Danger Zone</div>
                                 <p className='text-sm text-gray-500 mb-3'>Permanently delete your account and all associated data.</p>
                                 <div
                                     onClick={() => setDeleteModal(true)}
