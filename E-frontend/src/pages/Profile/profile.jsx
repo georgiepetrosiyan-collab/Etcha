@@ -392,10 +392,8 @@ const Profile = () => {
                     <div className='mt-5'>
                         <Card padding={1}>
                             <div className='flex justify-between items-center'>
-                                <div className='text-xl'>Activities</div>
+                                <div className='text-xl'>Recent posts</div>
                             </div>
-
-                            <div className='cursor-pointer px-3 py-1 w-fit border rounded-4xl bg-green-800 text-white font-semibold mt-2'>Posts</div>
 
                             <div className="overflow-x-auto my-2 flex gap-1 overflow-y-hidden w-full items-start">
                                 {postData.map((item, ind) => (
