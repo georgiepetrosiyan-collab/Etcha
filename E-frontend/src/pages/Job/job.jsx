@@ -216,8 +216,8 @@ const Job = () => {
 
     const currentCount =
         viewMode === 'available' ? availableJobs.length :
-        viewMode === 'mine' ? myJobs.length :
-        referrals.length;
+            viewMode === 'mine' ? myJobs.length :
+                referrals.length;
 
     const showDetailPanel = viewMode !== 'referrals' && !!selectedJob;
 
@@ -233,33 +233,38 @@ const Job = () => {
 
             {/* Main content */}
             <div className="w-full py-5 sm:w-[77%] flex flex-col gap-4">
-                <div className="flex justify-between items-center">
-                    <div className="text-xl font-semibold text-gray-900">Jobs</div>
-                    <button onClick={() => setIsPostOpen(true)} className="flex items-center gap-1 bg-accent hover:bg-accent-darker text-white text-sm font-medium px-4 py-2 rounded-md cursor-pointer transition-colors">
-                        <AddIcon sx={{ fontSize: 16 }} />
-                        Post a job
-                    </button>
-                </div>
+
 
                 <div className="flex flex-col md:flex-row gap-4 items-start">
                     {/* LIST PANEL — relative + overflow-visible so the dropdown can float over the list without pushing it down */}
                     <div className={`w-full bg-white rounded-lg border border-gray-200 overflow-visible flex flex-col shrink-0 transition-all relative ${showDetailPanel ? 'md:w-[38%]' : 'md:w-full'}`}>
 
-                        {/* Dropdown header */}
+                        {/* Dropdown Header */}
                         <div className="relative border-b border-gray-100">
-                            <button
-                                type="button"
-                                onClick={() => setDropdownOpen(o => !o)}
-                                className="w-full flex items-center justify-between px-4 py-4 cursor-pointer hover:bg-gray-50 transition-colors bg-white rounded-t-lg"
-                            >
-                                <span className="text-accent font-semibold text-sm flex items-center gap-1.5 leading-tight">
+                            <div className="w-full flex items-center justify-between px-4 py-4 bg-white rounded-t-lg">
+
+                                {/* Left: View Selection Dropdown Toggle */}
+                                <button
+                                    type="button"
+                                    onClick={() => setDropdownOpen(o => !o)}
+                                    className="flex items-center gap-1.5 cursor-pointer text-accent font-semibold text-sm leading-tight hover:opacity-80 transition-opacity"
+                                >
                                     {dropdownOpen ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
                                     {VIEW_LABELS[viewMode]}
-                                </span>
-                                {currentCount > 0 && <span className="text-xs text-gray-400">{currentCount}</span>}
-                            </button>
+                                </button>
 
-                            {/* Floats OVER the list below — does not affect list height/scroll */}
+                                {/* Right: Plus Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => setIsPostOpen(true)}
+                                    title="Post a job"
+                                    className="flex items-center justify-center p-1 bg-accent hover:bg-accent-darker text-white rounded-md cursor-pointer transition-colors"
+                                >
+                                    <AddIcon sx={{ fontSize: 18 }} />
+                                </button>
+                            </div>
+
+                            {/* Floating Dropdown Options */}
                             {dropdownOpen && (
                                 <>
                                     <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
@@ -557,16 +562,16 @@ const Job = () => {
                 <ConfirmModal
                     title={
                         confirmAction.type === 'delete' ? "Delete this job posting?" :
-                        confirmAction.type === 'close' ? "Close this vacancy?" : "Reopen this vacancy?"
+                            confirmAction.type === 'close' ? "Close this vacancy?" : "Reopen this vacancy?"
                     }
                     message={
                         confirmAction.type === 'delete' ? "This will permanently remove the vacancy and all applications to it. This can't be undone." :
-                        confirmAction.type === 'close' ? "People will no longer be able to apply or create a CV for this job." :
-                        "This job will appear in other people's feeds again and accept applications."
+                            confirmAction.type === 'close' ? "People will no longer be able to apply or create a CV for this job." :
+                                "This job will appear in other people's feeds again and accept applications."
                     }
                     confirmLabel={
                         confirmAction.type === 'delete' ? "Delete" :
-                        confirmAction.type === 'close' ? "Close vacancy" : "Reopen"
+                            confirmAction.type === 'close' ? "Close vacancy" : "Reopen"
                     }
                     danger={confirmAction.type === 'delete' || confirmAction.type === 'close'}
                     loading={actionLoading}

@@ -1,67 +1,78 @@
-//E/E-frontend/components/ImageModal/imageModal.jsx
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react';
 import axios from 'axios';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
-
 const ImageModal = ({ isCircular, selfData, handleEditFunc }) => {
-
     const [imgLink, setImageLink] = useState(isCircular ? selfData?.profilePic : selfData?.cover_pic);
-
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const handleInputImage = async (e) => {
         const files = e.target.files;
+        if (!files || files.length === 0) return;
+
         const data = new FormData();
         data.append('file', files[0]);
-        
         data.append('upload_preset', 'etchacloud');
-        setLoading(true)
+        
+        setLoading(true);
         try {
             const response = await axios.post("https://api.cloudinary.com/v1_1/dmkqcilgq/image/upload", data);
-
             const imageUrl = response.data.url;
             setImageLink(imageUrl);
         } catch (err) {
             console.log(err);
-        }finally{
-            setLoading(false)
+        } finally {
+            setLoading(false);
         }
-    }
-
+    };
 
     const handleSubmitBtn = async () => {
         let { data } = { ...selfData };
         if (isCircular) {
-            data = { ...data, ['profilePic']: imgLink }
+            data = { ...data, ['profilePic']: imgLink };
         } else {
-
-            data = { ...data, ['cover_pic']: imgLink }
+            data = { ...data, ['cover_pic']: imgLink };
         }
-        handleEditFunc(data)
-    }
+        handleEditFunc(data);
+    };
+
     return (
-        <div className='p-5 relative flex items-center flex-col h-full'>
-            {
-                isCircular ? (
-                    <img className='rounded-full  w-38 h-38' src={imgLink} />
+        <div className='p-5 flex flex-col items-center w-full'>
+            {/* Image Preview */}
+            <div className='w-full flex justify-center mb-6'>
+                {isCircular ? (
+                    <img className='rounded-full w-38 h-38 object-cover' src={imgLink} alt="Profile" />
                 ) : (
-                    <img className='rounded-xl w-full h-50 object-cover' src={imgLink} />
-                )
-            }
+                    <img className='rounded-xl w-full h-48 object-cover' src={imgLink} alt="Cover" />
+                )}
+            </div>
 
-            <label htmlFor='btn-submit' className='absolute bottom-10 left-0 p-3 bg-blue-900 text-white rounded-2xl cursor-pointer'>Upload</label>
-            <input onChange={handleInputImage} type='file' className='hidden' id='btn-submit' />
+            {/* Actions Bar Below Image */}
+            <div className='flex justify-between items-center w-full mt-2'>
+                <label 
+                    htmlFor='btn-submit' 
+                    className='px-5 py-2.5 bg-accent text-white rounded-full font-medium cursor-pointer hover:bg-[#006d68] transition'
+                >
+                    Upload
+                </label>
+                <input onChange={handleInputImage} type='file' className='hidden' id='btn-submit' />
 
-            {
-
-                loading ? <Box sx={{ display: 'flex' }}>
-                    <CircularProgress />
-                </Box> : <div className='absolute bottom-10 right-0 p-3 bg-blue-900 text-white rounded-2xl cursor-pointer' onClick={handleSubmitBtn}> Submit</div>
-            }
+                {loading ? (
+                    <Box sx={{ display: 'flex' }}>
+                        <CircularProgress size={28} style={{ color: '#00827D' }} />
+                    </Box>
+                ) : (
+                    <button 
+                        className='px-5 py-2.5 bg-accent text-white rounded-full font-medium hover:bg-[#006d68] transition' 
+                        onClick={handleSubmitBtn}
+                    >
+                        Submit
+                    </button>
+                )}
+            </div>
         </div>
-    )
-}
+    );
+};
 
-export default ImageModal
+export default ImageModal;

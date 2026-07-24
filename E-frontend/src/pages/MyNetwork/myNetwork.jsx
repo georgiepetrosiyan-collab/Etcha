@@ -4,13 +4,15 @@ import ProfileCard from '../../components/ProfileCard/profileCard';
 import Navbar_3 from '../../components/Navbar_3/navbar_3';
 import Advertisement from '../../components/Advertisement/advertisement';
 import Card from '../../components/Card/card';
+import Modal from '../../components/Modal/modal';
+import MessageModal from '../../components/MessageModal/messageModal';
 
 const MyNetwork = () => {
     const [text, setText] = useState("Catch Up with Friends");
     const [data, setData] = useState([]);
     const [ownData, setOwnData] = useState(null);
-    // FIX 1: Defined notificationCount state
     const [notificationCount, setNotificationCount] = useState(0);
+    const [messageTarget, setMessageTarget] = useState(null);
 
     useEffect(() => {
         const userData = localStorage.getItem('userInfo');
@@ -23,7 +25,6 @@ const MyNetwork = () => {
             setData(res.data.friends || []);
         } catch (err) {
             console.log(err);
-            alert("Something Went Wrong");
         }
     };
 
@@ -33,7 +34,6 @@ const MyNetwork = () => {
             setData(res.data.pendingFriendsList || []);
         } catch (err) {
             console.log(err);
-            alert("Something Went Wrong");
         }
     };
 
@@ -42,7 +42,7 @@ const MyNetwork = () => {
             await axios.post('http://localhost:4000/api/auth/acceptFriendRequest', { friendId }, { withCredentials: true });
             setData(prev => prev.filter(item => item._id !== friendId));
         } catch (err) {
-            alert(err?.response?.data?.error || "Something Went Wrong");
+            console.log(err);
         }
     };
 
@@ -51,7 +51,7 @@ const MyNetwork = () => {
             await axios.post('http://localhost:4000/api/auth/ignoreFriendRequest', { friendId }, { withCredentials: true });
             setData(prev => prev.filter(item => item._id !== friendId));
         } catch (err) {
-            alert(err?.response?.data?.error || "Something Went Wrong");
+            console.log(err);
         }
     };
 
@@ -80,7 +80,6 @@ const MyNetwork = () => {
                     <div className="flex gap-4 mb-6 border-b border-gray-200 pb-4">
                         <button 
                             onClick={() => setText("Catch Up with Friends")}
-                            // FIX 2: Replaced bg-accent with arbitrary value [#00827D]
                             className={`px-6 py-2 rounded-full font-semibold transition ${text === "Catch Up with Friends" ? 'bg-accent text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                             Friends
                         </button>
@@ -110,7 +109,11 @@ const MyNetwork = () => {
                                             <button onClick={() => handleAccept(item._id)} className="px-4 py-1 bg-accent text-white rounded-full hover:bg-[#006d68] transition">Accept</button>
                                         </div>
                                     ) : (
-                                        <button className="text-accent font-medium text-sm hover:underline">Message</button>
+                                        <button 
+                                            onClick={() => setMessageTarget(item)}
+                                            className="text-accent font-medium text-sm hover:underline">
+                                            Message
+                                        </button>
                                     )}
                                 </div>
                             ))
@@ -127,6 +130,13 @@ const MyNetwork = () => {
             <div className="w-[26%] py-5 hidden md:block">
                 <div className="sticky top-19"><Advertisement /></div>
             </div>
+
+            {/* Message Modal */}
+            {messageTarget && (
+                <Modal title={`Message ${messageTarget.f_name}`} closeModal={() => setMessageTarget(null)}>
+                    <MessageModal selfData={ownData} userData={messageTarget} />
+                </Modal>
+            )}
         </div>
     );
 };

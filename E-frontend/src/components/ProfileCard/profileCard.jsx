@@ -9,11 +9,11 @@ const ProfileCard = (props) => {
     <Card padding={0}>
         <Link to={`/profile/${props?.data?._id}`} className="relative h-25">
             <div className="relative w-full h-22 rounded-md">
-                <img src={props?.data?.cover_pic} className='rounded-t-md h-full w-full' alt="cover" />
+                <img src={props?.data?.cover_pic || null} className='rounded-t-md h-full w-full' alt="cover" />
             </div>
 
             <div className ="absolute top-14 left-6 z-10">
-                <img src={props?.data?.profilePic} className='rounded-full border-2 h-16 w-16 border-white cursor-pointer' alt="profile" />
+                <img src={props?.data?.profilePic || null} className='rounded-full border-2 h-16 w-16 border-white cursor-pointer' alt="profile" />
             </div>
         </Link>
         

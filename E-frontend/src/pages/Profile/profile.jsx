@@ -1,5 +1,3 @@
-//E/E-frontend/pages/Profile/profile.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -277,9 +275,19 @@ const Profile = () => {
                                         <div className="text-md text-accent w-fit cursor-pointer hover:underline">{userData?.friends?.length} Connections</div>
 
                                         <div className='md:flex w-full justify-between'>
-                                            <div className="my-5 flex gap-5">
+                                            <div className="my-5 flex gap-3 flex-wrap items-center">
                                                 <Button onClick={copyToClipboard}>Copy link</Button>
-                                                {isOwnProfile && <Button onClick={handleLogout}>Sign out</Button>}
+                                                {isOwnProfile && (
+                                                    <>
+                                                        <Button onClick={handleLogout}>Sign out</Button>
+                                                        <button 
+                                                            onClick={() => setDeleteModal(true)}
+                                                            className='px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-full text-sm transition-colors cursor-pointer'
+                                                        >
+                                                            Delete account
+                                                        </button>
+                                                    </>
+                                                )}
                                             </div>
 
                                             <div className="my-5 flex gap-5">
@@ -507,21 +515,6 @@ const Profile = () => {
                             </div>
                         </Card>
                     </div>
-
-                    {isOwnProfile && (
-                        <div className='mt-5'>
-                            <Card padding={1}>
-                                <div className='text-xl font-semibold text-red-700 mb-1'>Danger Zone</div>
-                                <p className='text-sm text-gray-500 mb-3'>Permanently delete your account and all associated data.</p>
-                                <div
-                                    onClick={() => setDeleteModal(true)}
-                                    className='cursor-pointer p-2 border border-red-300 rounded-lg text-red-700 font-semibold w-fit hover:bg-red-50 transition-colors'
-                                >
-                                    Delete Account
-                                </div>
-                            </Card>
-                        </div>
-                    )}
                 </div>
 
                 <div className='hidden md:flex md:w-[28%]'>
