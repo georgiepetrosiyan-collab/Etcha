@@ -1,14 +1,16 @@
-//E/E-backend/controller/user.js
+// E/E-backend/controller/user.js
 const User = require('../models/user');
 const bcryptjs = require('bcryptjs');
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const NotificationModel = require('../models/notification'); 
 
+// Centralized cookie configuration (30 days)
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production', 
-    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
 };
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -27,7 +29,8 @@ exports.loginThroughGmail = async (req, res) => {
             userExist = await User.create({ googleId: sub, email, f_name: name, profilePic: picture });
         }
 
-        const jwttoken = jwt.sign({ userId: userExist._id }, process.env.JWT_PRIVATE_KEY, { expiresIn: '7d' });
+        // Synchronized to 30d
+        const jwttoken = jwt.sign({ userId: userExist._id }, process.env.JWT_PRIVATE_KEY, { expiresIn: '30d' });
         res.cookie('token', jwttoken, cookieOptions);
         userExist.password = undefined; 
         return res.status(200).json({ user: userExist });
@@ -68,7 +71,8 @@ exports.login = async (req, res) => {
 
         const isMatch = await bcryptjs.compare(password, userExist.password);
         if (isMatch) {
-            const jwttoken = jwt.sign({ userId: userExist._id }, process.env.JWT_PRIVATE_KEY, { expiresIn: '7d' }); 
+            // Synchronized to 30d
+            const jwttoken = jwt.sign({ userId: userExist._id }, process.env.JWT_PRIVATE_KEY, { expiresIn: '30d' }); 
             res.cookie('token', jwttoken, cookieOptions);
             userExist.password = undefined; 
             return res.status(200).json({ message: "Logged in successfully", success: true, user: userExist });
@@ -86,7 +90,7 @@ exports.updateUser = async (req, res) => {
         const { user } = req.body;
         if (!user) return res.status(400).json({ error: 'User update data is required' });
 
-const allowedUpdates = {
+        const allowedUpdates = {
             f_name: user.f_name,
             headline: user.headline,
             curr_company: user.curr_company,
@@ -103,7 +107,7 @@ const allowedUpdates = {
             payoutEmail: user.payoutEmail,
             payoutCardHolder: user.payoutCardHolder,
         };
-        // Never persist a full card number — only keep the last 4 digits.
+
         if (typeof user.payoutCardNumber === 'string' && user.payoutCardNumber.trim().length > 0) {
             const digitsOnly = user.payoutCardNumber.replace(/\D/g, '');
             allowedUpdates.payoutCardLast4 = digitsOnly.slice(-4);
@@ -144,7 +148,6 @@ exports.deleteAccount = async (req, res) => {
     try {
         const selfId = req.user._id;
 
-        // Remove this user from everyone else's friends/pending lists
         await User.updateMany(
             { $or: [{ friends: selfId }, { pending_friends: selfId }] },
             { $pull: { friends: selfId, pending_friends: selfId } }

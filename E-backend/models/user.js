@@ -18,23 +18,27 @@ const UserSchema = new mongoose.Schema({
     about: { type: String, default: "" },
     skills: { type: [String], default: [] },
 experience: [
-        {
-            designation: { type: String },
-            company_name: { type: String },
-            duration: { type: String },
-            location: { type: String },
-        }
-    ],
-experience: [
-        {
-            designation: { type: String },
-            company_name: { type: String },
-            startDate: { type: String },
-            endDate: { type: String }, // "Present" if ongoing
-            location: { type: String },
-            description: { type: String, default: "" }, // optional — what they actually did
-        }
-    ],
+    {
+        designation: { type: String, default: "" },
+        company_name: { type: String, default: "" },
+        startDate: { type: String, default: "" },
+        endDate: { type: String, default: "Present" },
+        location: { type: String, default: "" },
+        description: { type: String, default: "" },
+    }
+],
+
+education: [
+    {
+        school: { type: String, default: "" },
+        degree: { type: String, default: "" },
+        fieldOfStudy: { type: String, default: "" },
+        startDate: { type: String, default: "" },
+        endDate: { type: String, default: "" },
+        duration: { type: String, default: "" },
+        description: { type: String, default: "" }
+    }
+],
     projects: [
         {
             title: { type: String },

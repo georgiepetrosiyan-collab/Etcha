@@ -46,14 +46,12 @@ const Post = ({ profile, item, personalData, expandComments }) => {
     // automatically load comments if expandComments is true
     useEffect(() => {
         let cancelled = false;
-        console.log("post:",item);
 
         if (expandComments && item?._id) {
             async function fetchData() {
                 setCommentLoading(true);
                 try {
                     const res = await axios.get(`http://localhost:4000/api/comment/${item?._id}`);
-                    console.log(res)
                     if (res.status != 200) throw new Error('Request failed');
                     if (!cancelled) setComments(res.data.comments);
                     setCommentLoading(false);
@@ -141,7 +139,7 @@ const Post = ({ profile, item, personalData, expandComments }) => {
                     className='w-12 h-12 rounded-4xl'
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <img className='rounded-4xl w-12 h-12 border-2 border-white cursor-pointer' src={item?.user?.profilePic} alt="user avatar" />
+                    <img className='rounded-4xl w-12 h-12 border-2 border-white cursor-pointer' src={item?.user?.profilePic || null} alt="user avatar" />
                 </Link>
                 <div>
                     <div className="text-lg font-semibold">{item?.user?.f_name}</div>
@@ -164,7 +162,7 @@ const Post = ({ profile, item, personalData, expandComments }) => {
             {/* Post Image Container */}
             {item?.imageLink && (
                 <div className='w-full h-75'>
-                    <img className='w-full h-full object-cover' src={item?.imageLink} alt="Post content" />
+                    <img className='w-full h-full object-cover' src={item.imageLink} alt="Post content" />
                 </div>
             )}
 
@@ -207,14 +205,14 @@ const Post = ({ profile, item, personalData, expandComments }) => {
             {(comment || expandComments === true) && (
                 <div className='p-4 w-full'>
                     <form className="w-full flex gap-2 pb-4" onSubmit={handleSendComment}>
-                        <img src={personalData?.profilePic} className="rounded-full w-12 h-12 border-2 border-white cursor-pointer" alt="avatar" />
+                        <img src={personalData?.profilePic || null} className="rounded-full w-12 h-12 border-2 border-white cursor-pointer" alt="avatar" />
                         <input 
                             value={commentText} 
                             onChange={(event) => setCommenttext(event.target.value)}
                             placeholder="Add a comment..." 
                             className="w-full border border-gray-500 p-2 rounded-3xl hover:bg-gray-100 px-4" 
                         />
-                        <button type="submit" className='cursor-pointer bg-[#00827D] text-white rounded-2xl py-1 px-3'>
+                        <button type="submit" className='cursor-pointer bg-accent text-white rounded-2xl py-1 px-3'>
                             Send
                         </button>
                     </form>

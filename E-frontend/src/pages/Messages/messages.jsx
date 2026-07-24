@@ -105,7 +105,7 @@ const Messages = () => {
     };
 
     return (
-        <div className="px-5 xl:px-50 py-9 flex gap-5 w-full mt-5 bg-gray-100 min-h-screen pt-20">
+        <div className="px-5 xl:px-50 py-9 flex items-start gap-5 w-full mt-5 bg-gray-100 min-h-screen">
             {/* Left Side Bar */}
             <div className="w-[21%] sm:block sm:w-[23%] hidden py-5">
                 <div className="h-left">
@@ -116,10 +116,9 @@ const Messages = () => {
 
             {/* Middle: Messaging Area */}
             <div className="w-full py-5 sm:w-[50%]">
-                <h1 className="text-2xl font-bold mb-4 text-gray-800">Messaging</h1>
                 <Card padding={0} className="shadow-md overflow-hidden min-h-[70vh]">
                     <div className="border-b border-gray-200 p-4 bg-white flex justify-between items-center">
-                         <div className="py-1 px-4 bg-accent font-semibold flex gap-2 w-fit rounded-full text-white cursor-pointer hover:bg-[#006d68]">
+                        <div className="py-1 px-4 bg-accent font-semibold flex gap-2 w-fit rounded-full text-white cursor-pointer hover:bg-[#006d68]">
                             Focused <ArrowDropDownIcon />
                         </div>
                     </div>
@@ -199,7 +198,7 @@ const Messages = () => {
 
             {/* Right Sidebar: Ad */}
             <div className="w-[26%] py-5 hidden md:block">
-                <div className="my-5 sticky top-19">
+                <div className="sticky top-19">
                     <Advertisement />
                 </div>
             </div>

@@ -82,48 +82,36 @@ const CreateCVModal = ({ job, onClose }) => {
             setLoading(false);
         }
     };
+const handleDownloadPDF = async () => {
+    if (!cvRef.current) return;
+    setDownloading(true);
+    try {
+        const pageEls = Array.from(cvRef.current.querySelectorAll('.resume-page'));
+        if (pageEls.length === 0) return;
 
-    const handleDownloadPDF = async () => {
-        if (!cvRef.current) return;
-        setDownloading(true);
-        try {
-            const canvas = await html2canvas(cvRef.current, {
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+
+        for (let i = 0; i < pageEls.length; i++) {
+            const canvas = await html2canvas(pageEls[i], {
                 scale: 2,
                 useCORS: true,
-                backgroundColor: '#ffffff',
-                width: A4_WIDTH_PX,
-                windowWidth: A4_WIDTH_PX
+                backgroundColor: '#ffffff'
             });
-
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
-
-            const imgWidth = A4_WIDTH_PT;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            let heightLeft = imgHeight;
-            let position = 0;
-
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= A4_HEIGHT_PT;
-
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= A4_HEIGHT_PT;
-            }
-
-            const fileName = `${(cv?.fullName || 'Resume').replace(/\s+/g, '_')}_${(job?.company || 'Resume').replace(/\s+/g, '_')}.pdf`;
-            pdf.save(fileName);
-            toast.success("CV downloaded as PDF (A4)");
-        } catch (err) {
-            console.error(err);
-            toast.error("Failed to generate PDF");
-        } finally {
-            setDownloading(false);
+            if (i > 0) pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, 0, A4_WIDTH_PT, A4_HEIGHT_PT);
         }
-    };
+
+        const fileName = `${(cv?.fullName || 'Resume').replace(/\s+/g, '_')}_${(job?.company || 'Resume').replace(/\s+/g, '_')}.pdf`;
+        pdf.save(fileName);
+        toast.success("CV downloaded as PDF (A4)");
+    } catch (err) {
+        console.error(err);
+        toast.error("Failed to generate PDF");
+    } finally {
+        setDownloading(false);
+    }
+};
 
     const handleApply = async () => {
         setApplying(true);

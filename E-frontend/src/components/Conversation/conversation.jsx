@@ -22,7 +22,7 @@ const Conversation = ({ item, ownData, handleSelectedConv, activeConvId }) => {
     return (
         <div onClick={handleClickFunc} className={`flex items-center w-full cursor-pointer border-b border-gray-300 gap-3 p-4 hover:bg-gray-200 ${activeConvId === item?._id ? 'bg-gray-200' : ''}`}>
             <div className='shrink-0'>
-                <img className='w-12 h-12 rounded-full cursor-pointer object-cover' src={memberData?.profilePic || 'https://via.placeholder.com/150'} alt="Profile" />
+                <img className='w-12 h-12 rounded-full cursor-pointer object-cover' src={memberData?.profilePic || null} alt="Profile" />
             </div>
             <div>
                 <div className="text-md font-semibold">{memberData?.f_name}</div>

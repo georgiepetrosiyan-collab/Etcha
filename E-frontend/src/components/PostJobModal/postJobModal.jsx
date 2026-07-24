@@ -71,7 +71,7 @@ const PostJobModal = ({ onClose, onJobCreated }) => {
                         value={form.title}
                         onChange={handleChange}
                         placeholder="e.g. Frontend Developer"
-                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
+                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-accent rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
                     />
                 </div>
 
@@ -82,7 +82,7 @@ const PostJobModal = ({ onClose, onJobCreated }) => {
                         value={form.company}
                         onChange={handleChange}
                         placeholder="e.g. Etcha Inc."
-                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
+                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-accent rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
                     />
                 </div>
 
@@ -93,7 +93,7 @@ const PostJobModal = ({ onClose, onJobCreated }) => {
                         value={form.companyLogo}
                         onChange={handleChange}
                         placeholder="https://..."
-                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
+                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-accent rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
                     />
                 </div>
 
@@ -105,7 +105,7 @@ const PostJobModal = ({ onClose, onJobCreated }) => {
                             value={form.location}
                             onChange={handleChange}
                             placeholder="e.g. Yerevan, Armenia"
-                            className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
+                            className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-accent rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
                         />
                     </div>
                     <div className="w-36">
@@ -114,7 +114,7 @@ const PostJobModal = ({ onClose, onJobCreated }) => {
                             name="type"
                             value={form.type}
                             onChange={handleChange}
-                            className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
+                            className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-accent rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
                         >
                             <option>Full-time</option>
                             <option>Part-time</option>
@@ -132,7 +132,7 @@ const PostJobModal = ({ onClose, onJobCreated }) => {
                         value={form.salary}
                         onChange={handleChange}
                         placeholder="e.g. $1,500 - $2,000/mo"
-                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
+                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-accent rounded-md h-10 px-3 text-sm outline-none transition-all border border-transparent"
                     />
                 </div>
 
@@ -144,7 +144,7 @@ const PostJobModal = ({ onClose, onJobCreated }) => {
                         onChange={handleChange}
                         rows={2}
                         placeholder="One or two lines shown on the job card"
-                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-md px-3 py-2 text-sm outline-none resize-none transition-all border border-transparent"
+                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-accent rounded-md px-3 py-2 text-sm outline-none resize-none transition-all border border-transparent"
                     />
                 </div>
 
@@ -156,14 +156,14 @@ const PostJobModal = ({ onClose, onJobCreated }) => {
                         onChange={handleChange}
                         rows={5}
                         placeholder="Responsibilities, requirements, benefits..."
-                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-md px-3 py-2 text-sm outline-none resize-none transition-all border border-transparent"
+                        className="w-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-accent rounded-md px-3 py-2 text-sm outline-none resize-none transition-all border border-transparent"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="mt-2 w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-semibold py-2.5 rounded-full cursor-pointer transition-colors"
+                    className="mt-2 w-full bg-accent hover:bg-accent-darker disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-semibold py-2.5 rounded-full cursor-pointer transition-colors"
                 >
                     {submitting ? "Posting..." : "Post job"}
                 </button>

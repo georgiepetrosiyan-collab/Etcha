@@ -125,13 +125,26 @@ function buildCVDictionaryTerms(cv) {
     });
 
     const structuredText = [];
+
+    if (cv.professionalSummary) structuredText.push(cv.professionalSummary);
+
     (cv.education || []).forEach(e => {
         if (e.degree) structuredText.push(e.degree);
         if (e.fieldOfStudy) structuredText.push(e.fieldOfStudy);
     });
+
     (cv.experience || []).forEach(e => {
         if (e.title) structuredText.push(e.title);
         if (e.bullets && e.bullets.length) structuredText.push(e.bullets.join(' '));
+    });
+
+    (cv.projects || []).forEach(p => {
+        if (p.title) structuredText.push(p.title);
+        if (p.description) structuredText.push(p.description);
+    });
+
+    (cv.certifications || []).forEach(c => {
+        if (c.name) structuredText.push(c.name);
     });
 
     extractDictionaryTerms(structuredText.join(' ')).forEach(t => terms.add(t));
